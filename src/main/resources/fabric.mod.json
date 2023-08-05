@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "goop",
+  "version": "${version}",
+  "name": "Goop Technology",
+  "description": "Adds Splatter particle effects for Blood, Slime or other cool VFX",
+  "authors": [
+    "Absolutelyaya"
+  ],
+  "contact": {
+    "repo": "<tba>"
+  },
+  "license": "MIT",
+  "icon": "assets/goop/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "absolutelyaya.goop.client.GoopTechnologyClient"
+    ],
+    "main": [
+      "absolutelyaya.goop.GoopTechnology"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
