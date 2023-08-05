@@ -1,4 +1,4 @@
-package absolutelyaya.ultracraft.particle.goop;
+package absolutelyaya.goop.particles;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;

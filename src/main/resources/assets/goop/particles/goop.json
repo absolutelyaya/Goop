@@ -1,9 +1,9 @@
 {
   "textures":
   [
-    "ultracraft:goop/puddle1",
-    "ultracraft:goop/puddle2",
-    "ultracraft:goop/puddle3",
-    "ultracraft:goop/puddle4"
+    "goop:puddle1",
+    "goop:puddle2",
+    "goop:puddle3",
+    "goop:puddle4"
   ]
 }

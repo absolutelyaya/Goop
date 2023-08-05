@@ -1,4 +1,4 @@
-package absolutelyaya.ultracraft.particle.goop;
+package absolutelyaya.goop.particles;
 
 import net.minecraft.client.particle.*;
 import net.minecraft.client.world.ClientWorld;

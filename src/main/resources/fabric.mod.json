@@ -3,7 +3,7 @@
   "id": "goop",
   "version": "${version}",
   "name": "Goop Technology",
-  "description": "Adds Splatter particle effects for Blood, Slime or other cool VFX",
+  "description": "modmenu.descriptionTranslation.goop",
   "authors": [
     "Absolutelyaya"
   ],
@@ -15,15 +15,25 @@
   "environment": "*",
   "entrypoints": {
     "client": [
-      "absolutelyaya.goop.client.GoopTechnologyClient"
+      "absolutelyaya.goop.client.GoopClient"
     ],
     "main": [
-      "absolutelyaya.goop.GoopTechnology"
+      "absolutelyaya.goop.Goop"
+    ],
+    "modmenu": [
+      "absolutelyaya.goop.client.ModMenu"
     ]
   },
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": "*",
     "minecraft": "${minecraft_version}"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "yaya.support.kofi": "https://ko-fi.com/absolutelyaya"
+      }
+    }
   }
 }

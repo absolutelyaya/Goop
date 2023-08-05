@@ -1,6 +1,6 @@
-package absolutelyaya.ultracraft.particle.goop;
+package absolutelyaya.goop.particles;
 
-import absolutelyaya.ultracraft.registry.ParticleRegistry;
+import absolutelyaya.goop.registries.ParticleRegistry;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;

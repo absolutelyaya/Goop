@@ -1,4 +1,4 @@
-package absolutelyaya.ultracraft.particle.goop;
+package absolutelyaya.goop.particles;
 
 import net.minecraft.client.particle.SpriteBillboardParticle;
 import net.minecraft.client.particle.SpriteProvider;

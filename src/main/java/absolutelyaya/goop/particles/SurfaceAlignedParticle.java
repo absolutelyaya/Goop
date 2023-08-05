@@ -1,7 +1,7 @@
-package absolutelyaya.ultracraft.particle.goop;
+package absolutelyaya.goop.particles;
 
-import absolutelyaya.ultracraft.client.Ultraconfig;
-import absolutelyaya.ultracraft.client.UltracraftClient;
+import absolutelyaya.goop.client.GoopClient;
+import absolutelyaya.goop.client.GoopConfig;
 import net.minecraft.client.particle.SpriteBillboardParticle;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.render.Camera;
@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 {
-	static final Ultraconfig config;
+	static final GoopConfig config;
 	
 	private final List<Boolean> faceShouldRender = new ArrayList<>();
 	private final List<Vec3d> verts = new ArrayList<>();
@@ -92,7 +92,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 	@Override
 	public void buildGeometry(VertexConsumer vertexConsumer, Camera camera, float tickDelta)
 	{
-		boolean debug = UltracraftClient.getConfigHolder().get().goopDebug;
+		boolean debug = config.goopDebug;
 		if(verts.size() == 0)
 			return;
 		
@@ -238,6 +238,6 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 	}
 	
 	static {
-		config = UltracraftClient.getConfigHolder().getConfig();
+		config = GoopClient.getConfig();
 	}
 }
