@@ -13,6 +13,9 @@
   "license": "MIT",
   "icon": "assets/goop/icon.png",
   "environment": "*",
+  "mixins": [
+    "goop.mixins.json"
+  ],
   "entrypoints": {
     "client": [
       "absolutelyaya.goop.client.GoopClient"
@@ -22,6 +25,9 @@
     ],
     "modmenu": [
       "absolutelyaya.goop.client.ModMenu"
+    ],
+    "goop": [
+      "absolutelyaya.goop.api.Examples"
     ]
   },
   "depends": {

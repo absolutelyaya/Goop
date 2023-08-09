@@ -3,6 +3,7 @@ package absolutelyaya.goop.client;
 import absolutelyaya.goop.particles.GoopDropParticle;
 import absolutelyaya.goop.particles.GoopParticle;
 import absolutelyaya.goop.particles.GoopStringParticle;
+import absolutelyaya.goop.registries.PacketRegistry;
 import absolutelyaya.goop.registries.ParticleRegistry;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigHolder;
@@ -28,5 +29,7 @@ public class GoopClient implements ClientModInitializer
 		particleRegistry.register(ParticleRegistry.GOOP_DROP, GoopDropParticle.Factory::new);
 		particleRegistry.register(ParticleRegistry.GOOP, GoopParticle.Factory::new);
 		particleRegistry.register(ParticleRegistry.GOOP_STRING, GoopStringParticle.Factory::new);
+		
+		PacketRegistry.registerClient();
 	}
 }
