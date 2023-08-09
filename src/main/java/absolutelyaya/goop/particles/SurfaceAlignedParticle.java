@@ -77,7 +77,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 					vert = new Vec3d(modDir.getX() * vx / subdivisions, modDir.getY(), modDir.getZ() * vy / subdivisions);
 				else
 					vert = new Vec3d(modDir.getX() * vx / subdivisions, modDir.getY() * vy / subdivisions, modDir.getZ() * vx / subdivisions);
-				vert.add(dir.multiply(random.nextFloat() / 50)); //fight Z-Fighting
+				vert = vert.add(dir.multiply(random.nextFloat() / 50)); //fight Z-Fighting
 				verts.add(vert);
 				faceShouldRender.add(true);
 				uvs.add(new Vec2f(MathHelper.lerp(vx / subdivisions, getMinU(), getMaxU()), MathHelper.lerp(vy / subdivisions, getMinV(), getMaxV())));

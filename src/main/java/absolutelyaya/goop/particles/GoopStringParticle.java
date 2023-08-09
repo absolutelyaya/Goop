@@ -1,5 +1,7 @@
 package absolutelyaya.goop.particles;
 
+import absolutelyaya.goop.client.GoopClient;
+import absolutelyaya.goop.client.GoopConfig;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.ParticleTextureSheet;
@@ -11,11 +13,13 @@ import org.jetbrains.annotations.Nullable;
 
 public class GoopStringParticle extends SpriteAAParticle
 {
-	protected GoopStringParticle(ClientWorld world, Vec3d pos, SpriteProvider spriteProvider, Vec3d color, float scale)
+	protected GoopStringParticle(ClientWorld world, Vec3d pos, SpriteProvider spriteProvider, Vec3d color, float scale, boolean mature)
 	{
 		super(world, pos.x, pos.y - 0.25, pos.z, spriteProvider);
 		gravityStrength = random.nextFloat() * 0.25f + 0.1f;
 		maxAge = random.nextInt(15) + 20;
+		GoopConfig config = GoopClient.getConfig();
+		color = mature && config.censorMature ? Vec3d.unpackRgb(config.censorColor) : color;
 		setColor((float)color.getX(), (float)color.getY(), (float)color.getZ());
 		this.scale = this.scale.multiply(scale);
 		collidesWithWorld = true;
@@ -57,7 +61,7 @@ public class GoopStringParticle extends SpriteAAParticle
 		@Override
 		public Particle createParticle(GoopStringParticleEffect parameters, ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ)
 		{
-			return new GoopStringParticle(world, new Vec3d(x, y, z), spriteProvider, parameters.getColor(), parameters.getScale());
+			return new GoopStringParticle(world, new Vec3d(x, y, z), spriteProvider, parameters.getColor(), parameters.getScale(), parameters.isMature());
 		}
 	}
 }

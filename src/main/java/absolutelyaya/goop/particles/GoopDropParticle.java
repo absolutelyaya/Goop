@@ -1,5 +1,7 @@
 package absolutelyaya.goop.particles;
 
+import absolutelyaya.goop.client.GoopClient;
+import absolutelyaya.goop.client.GoopConfig;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
@@ -17,17 +19,21 @@ public class GoopDropParticle extends SpriteBillboardParticle
 {
 	protected final SpriteProvider spriteProvider;
 	protected final Vec3d color;
+	protected final boolean mature;
 	final float rotSpeed;
 	final float totalScale;
 	
-	protected GoopDropParticle(ClientWorld clientWorld, Vec3d pos, Vec3d vel, SpriteProvider spriteProvider, Vec3d color, float scale)
+	protected GoopDropParticle(ClientWorld clientWorld, Vec3d pos, Vec3d vel, SpriteProvider spriteProvider, Vec3d color, float scale, boolean mature)
 	{
 		super(clientWorld, pos.x, pos.y, pos.z);
+		GoopConfig config = GoopClient.getConfig();
+		color = mature && config.censorMature ? Vec3d.unpackRgb(config.censorColor) : color;
 		setColor((float)color.getX(), (float)color.getY(), (float)color.getZ());
 		this.color = color;
 		this.scale = scale - (scale > 1 ? 1.25f * (scale / 2) : 0f);
 		totalScale = scale;
 		this.spriteProvider = spriteProvider;
+		this.mature = mature;
 		sprite = spriteProvider.getSprite(random);
 		gravityStrength = 1 + scale / 2;
 		maxAge = 300;
@@ -65,15 +71,15 @@ public class GoopDropParticle extends SpriteBillboardParticle
 							 .subtract(0, y < 0 ? 1 : 0, 0);
 			
 			if(dir.y != 0)
-				world.addParticle(new GoopParticleEffect(color, totalScale * 2.5f, dir),
+				world.addParticle(new GoopParticleEffect(color, totalScale * 2.5f, dir, mature),
 						x + dir.x * offset.x, pos.getY() + dir.y * offset.y, z + dir.z * offset.z,
 						0, 0, 0);
 			else if(dir.x != 0)
-				world.addParticle(new GoopParticleEffect(color, totalScale * 2.5f, dir),
+				world.addParticle(new GoopParticleEffect(color, totalScale * 2.5f, dir, mature),
 						pos.getX() + dir.x * offset.x, y + dir.y * offset.y, z + dir.z * offset.z,
 						0, 0, 0);
 			else if(dir.z != 0)
-				world.addParticle(new GoopParticleEffect(color, totalScale * 2.5f, dir),
+				world.addParticle(new GoopParticleEffect(color, totalScale * 2.5f, dir, mature),
 						x + dir.x * offset.x, y + dir.y * offset.y, pos.getZ() + dir.z * offset.z,
 						0, 0, 0);
 		}
@@ -114,7 +120,7 @@ public class GoopDropParticle extends SpriteBillboardParticle
 		public Particle createParticle(GoopDropParticleEffect parameters, ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ)
 		{
 			return new GoopDropParticle(world, new Vec3d(x, y, z), new Vec3d(velocityX, velocityY, velocityZ),
-					spriteProvider, parameters.getColor(), parameters.getScale());
+					spriteProvider, parameters.getColor(), parameters.getScale(), parameters.isMature());
 		}
 	}
 }

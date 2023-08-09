@@ -14,11 +14,13 @@ public abstract class AbstractGoopParticleEffect implements ParticleEffect
 {
 	protected final Vec3d color;
 	protected final float scale;
+	protected final boolean mature;
 	
-	public AbstractGoopParticleEffect(Vec3d color, float scale)
+	public AbstractGoopParticleEffect(Vec3d color, float scale, boolean mature)
 	{
 		this.color = color;
 		this.scale = MathHelper.clamp(scale, 0.01f, 4f);
+		this.mature = mature;
 	}
 	
 	public static Vec3d readVec3(StringReader reader) throws CommandSyntaxException
@@ -44,12 +46,13 @@ public abstract class AbstractGoopParticleEffect implements ParticleEffect
 		buf.writeFloat((float)this.color.getY());
 		buf.writeFloat((float)this.color.getZ());
 		buf.writeFloat(this.scale);
+		buf.writeBoolean(this.mature);
 	}
 	
 	public String asString()
 	{
-		return String.format(Locale.ROOT, "%s %.2f %.2f %.2f %.2f",
-				Registries.PARTICLE_TYPE.getId(this.getType()), this.color.getX(), this.color.getY(), this.color.getZ(), this.scale);
+		return String.format(Locale.ROOT, "%s %.2f %.2f %.2f %.2f, %s",
+				Registries.PARTICLE_TYPE.getId(this.getType()), this.color.getX(), this.color.getY(), this.color.getZ(), this.scale, this.mature);
 	}
 	
 	public Vec3d getColor() {
@@ -58,5 +61,10 @@ public abstract class AbstractGoopParticleEffect implements ParticleEffect
 	
 	public float getScale() {
 		return this.scale;
+	}
+	
+	public boolean isMature()
+	{
+		return mature;
 	}
 }

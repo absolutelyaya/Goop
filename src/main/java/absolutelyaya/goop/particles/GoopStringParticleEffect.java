@@ -10,9 +10,9 @@ import net.minecraft.util.math.Vec3d;
 
 public class GoopStringParticleEffect extends AbstractGoopParticleEffect
 {
-	public GoopStringParticleEffect(Vec3d color, float scale)
+	public GoopStringParticleEffect(Vec3d color, float scale, boolean mature)
 	{
-		super(color, scale);
+		super(color, scale, mature);
 	}
 	
 	@Override
@@ -26,16 +26,18 @@ public class GoopStringParticleEffect extends AbstractGoopParticleEffect
 		@Override
 		public GoopStringParticleEffect read(ParticleType type, StringReader reader) throws CommandSyntaxException
 		{
-			Vec3d Vec3d = AbstractGoopParticleEffect.readVec3(reader);
+			Vec3d color = AbstractGoopParticleEffect.readVec3(reader);
 			reader.expect(' ');
-			float f = reader.readFloat();
-			return new GoopStringParticleEffect(Vec3d, f);
+			float size = reader.readFloat();
+			reader.expect(' ');
+			boolean mature = reader.readBoolean();
+			return new GoopStringParticleEffect(color, size, mature);
 		}
 		
 		@Override
 		public GoopStringParticleEffect read(ParticleType type, PacketByteBuf buf)
 		{
-			return new GoopStringParticleEffect(readVec3(buf), buf.readFloat());
+			return new GoopStringParticleEffect(readVec3(buf), buf.readFloat(), buf.readBoolean());
 		}
 	}
 }

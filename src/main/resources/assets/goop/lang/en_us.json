@@ -2,6 +2,8 @@
   "modmenu.descriptionTranslation.goop": "Adds Splatter Particle Effects for Blood, Slime or other cool VFX",
   "yaya.support.kofi": "Support yayas hijinx",
 
+  "text.autoconfig.goop.title": "Goop Config",
+
   "text.autoconfig.goop.category.default": "Goop",
   "text.autoconfig.goop.category.debug": "Debug",
 
@@ -9,10 +11,18 @@
   "text.autoconfig.goop.option.fancyGoop.@Tooltip": "Disable for better performance, enable for better goop!",
 
   "text.autoconfig.goop.option.wrapToEdges": "Wrap to Edges",
-  "text.autoconfig.goop.option.wrapToEdges.@Tooltip": "Whether Goop should wrap to block edges",
+  "text.autoconfig.goop.option.wrapToEdges.@Tooltip": "Whether Goop should wrap to block edges.",
 
-  "text.autoconfig.goop.option.censorBlood": "Censor Blood",
-  "text.autoconfig.goop.option.censorBlood.@Tooltip": "Replaces Blood VFX colors with neon Pink.",
+  "text.autoconfig.goop.option.censorMature": "Censor Mature Content",
+  "text.autoconfig.goop.option.censorMature.@Tooltip": "Replaces the colors of Goop VFX marked as mature with the censor Color.",
+
+  "text.autoconfig.goop.option.censorColor": "Censor Color",
+
+  "text.autoconfig.goop.option.permanent": "Permanent",
+  "text.autoconfig.goop.option.permanent.@Tooltip": "Prevents goop from fading. If enabled, goop will only disappear by being unloaded or the Goop Cap being reached.",
+
+  "text.autoconfig.goop.option.goopCap": "Goop Cap",
+  "text.autoconfig.goop.option.goopCap.@Tooltip": "Replaces the colors of Goop VFX marked as mature with neon Pink.",
 
   "text.autoconfig.goop.option.goopDebug": "Goop Debug",
   "text.autoconfig.goop.option.goopDebug.@Tooltip": "[WARNING] VERY LAGGY | Adds extra particles to show vertex info of goop puddles"
