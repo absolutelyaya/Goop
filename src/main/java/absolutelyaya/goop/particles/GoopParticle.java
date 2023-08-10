@@ -50,7 +50,7 @@ public class GoopParticle extends SurfaceAlignedParticle
 		super.tick();
 		
 		if(age <= appearTicks)
-			scale = MathHelper.clampedLerp(0f, size, (float)age / appearTicks);
+			scale = MathHelper.clampedLerp(0f, size, ((float)age / appearTicks));
 		else if(age >= maxAge - 60 && !config.permanent)
 		{
 			scale = MathHelper.clampedLerp(size, size * 0.5f, (age - (maxAge - 60)) / 60f);

@@ -6,10 +6,11 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.mob.ZombieEntity;
-import net.minecraft.entity.passive.ChickenEntity;
 import net.minecraft.entity.passive.SnowGolemEntity;
+import net.minecraft.entity.projectile.thrown.EggEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import org.joml.Vector4f;
 
 public class Examples implements GoopInitializer
@@ -57,11 +58,15 @@ public class Examples implements GoopInitializer
 				(snowGolem, data) -> 0.5f + snowGolem.getRandom().nextFloat() / 0.5f
 		).setWaterHandling(WaterHandling.REMOVE_PARTICLE));
 		
-		GoopEmitterRegistry.registerEmitter(EntityType.CHICKEN, new DamageGoopEmitter<ChickenEntity>(
-				(chicken, data) -> 0xffffff,
-				(chicken, data) -> new Vector4f(0f, 0f, 0f, MathHelper.clamp(data.amount() / 8f, 0.25f, 2f)),
-				(chicken, data) -> data.source().isIn(TagRegistry.PHYSICAL) ? Math.round(MathHelper.clamp(data.amount() / 2f, 2f, 12f)) : 0,
-				(chicken, data) -> MathHelper.clamp(data.amount() / 4f, 0.25f, 1)
+		//Makes Eggs leave behind... egg.. when thrown at something.
+		GoopEmitterRegistry.registerProjectileEmitter(EntityType.EGG, new ProjectileHitGoopEmitter<EggEntity>(
+				(egg, data) -> 0xffffff,
+				(egg, data) -> {
+					Vec3d vel = egg.getVelocity();
+					return new Vector4f((float)vel.x, (float)vel.y, (float)vel.z, 0f);
+				},
+				(egg, data) -> 1,
+				(egg, data) -> 0.5f
 		).markMature().setParticleEffectOverride(new Identifier(Goop.MOD_ID, "egg_goop"), new ExtraGoopData()));
 	}
 }

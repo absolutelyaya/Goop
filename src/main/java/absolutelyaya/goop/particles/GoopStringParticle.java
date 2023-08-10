@@ -2,6 +2,7 @@ package absolutelyaya.goop.particles;
 
 import absolutelyaya.goop.client.GoopClient;
 import absolutelyaya.goop.client.GoopConfig;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.ParticleTextureSheet;
@@ -23,6 +24,7 @@ public class GoopStringParticle extends SpriteAAParticle
 		setColor((float)color.getX(), (float)color.getY(), (float)color.getZ());
 		this.scale = this.scale.multiply(scale);
 		collidesWithWorld = true;
+		alpha = 0;
 	}
 	
 	@Override
@@ -36,9 +38,7 @@ public class GoopStringParticle extends SpriteAAParticle
 	{
 		super.move(dx, dy, dz);
 		if (!onGround)
-		{
 			scale = scale.add(-0.001f, (float)-dy, -0.001f);
-		}
 	}
 	
 	@Override
