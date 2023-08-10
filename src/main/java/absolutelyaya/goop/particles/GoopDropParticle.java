@@ -1,10 +1,21 @@
 package absolutelyaya.goop.particles;
 
+import absolutelyaya.goop.Goop;
+import absolutelyaya.goop.api.ExtraGoopData;
+import absolutelyaya.goop.api.IGoopEffectFactory;
 import absolutelyaya.goop.client.GoopClient;
 import absolutelyaya.goop.client.GoopConfig;
+import absolutelyaya.goop.registries.ParticleRegistry;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
+import net.minecraft.particle.ParticleType;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -12,9 +23,13 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.shape.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
+@SuppressWarnings("unchecked")
 public class GoopDropParticle extends SpriteBillboardParticle
 {
 	protected final SpriteProvider spriteProvider;
@@ -22,8 +37,10 @@ public class GoopDropParticle extends SpriteBillboardParticle
 	protected final boolean mature;
 	final float rotSpeed;
 	final float totalScale;
+	final Identifier effectOverride;
+	final ExtraGoopData extraData;
 	
-	protected GoopDropParticle(ClientWorld clientWorld, Vec3d pos, Vec3d vel, SpriteProvider spriteProvider, Vec3d color, float scale, boolean mature)
+	protected GoopDropParticle(ClientWorld clientWorld, Vec3d pos, Vec3d vel, SpriteProvider spriteProvider, Vec3d color, float scale, boolean mature, Identifier effectOverride, ExtraGoopData extraData)
 	{
 		super(clientWorld, pos.x, pos.y, pos.z);
 		GoopConfig config = GoopClient.getConfig();
@@ -34,6 +51,8 @@ public class GoopDropParticle extends SpriteBillboardParticle
 		totalScale = scale;
 		this.spriteProvider = spriteProvider;
 		this.mature = mature;
+		this.effectOverride = effectOverride;
+		this.extraData = extraData;
 		sprite = spriteProvider.getSprite(random);
 		gravityStrength = 1 + scale / 2;
 		maxAge = 300;
@@ -60,6 +79,28 @@ public class GoopDropParticle extends SpriteBillboardParticle
 		angle += rotSpeed;
 	}
 	
+	ParticleType<GoopParticleEffect> getEffect(Identifier override)
+	{
+		if(override == null)
+			return ParticleRegistry.GOOP;
+		RegistryKey<ParticleType<?>> registryKey = RegistryKey.of(RegistryKeys.PARTICLE_TYPE, override);
+		Optional<RegistryEntry.Reference<ParticleType<?>>> output = Registries.PARTICLE_TYPE.getReadOnlyWrapper().getOptional(registryKey);
+		return (ParticleType<GoopParticleEffect>)output.orElseThrow(() -> new InvalidIdentifierException(String.format("Identifier '%s' is not a Valid Particle Type", override))).value();
+	}
+	
+	Constructor<? extends AbstractGoopParticleEffect> getConstructor(ParticleType<?> type)
+	{
+		try
+		{
+			return ((IGoopEffectFactory)type.getParametersFactory()).getParticleEffectClass().getConstructor(Vec3d.class, float.class, Vec3d.class, boolean.class, ExtraGoopData.class);
+		}
+		catch (NoSuchMethodException e)
+		{
+			Goop.LOGGER.error("Required Goop Particle Effect Constructor not found:\n\b" + e.getMessage());
+			return null;
+		}
+	}
+	
 	void nextParticle(BlockPos pos, Vec3d dir)
 	{
 		if(!world.getBlockState(pos.subtract(new Vec3i(0, dir.y < 0 && y < 0 ? 2 : 0, 0))).isAir())
@@ -70,18 +111,25 @@ public class GoopDropParticle extends SpriteBillboardParticle
 			offset = offset.add(dir.x < 0 ? 0 : 1, dir.y < 0 ? (y < 0 ? 4 : 0) : 1, dir.z < 0 ? 0 : 1)
 							 .subtract(0, y < 0 ? 1 : 0, 0);
 			
-			if(dir.y != 0)
-				world.addParticle(new GoopParticleEffect(color, totalScale * 2.5f, dir, mature),
-						x + dir.x * offset.x, pos.getY() + dir.y * offset.y, z + dir.z * offset.z,
-						0, 0, 0);
-			else if(dir.x != 0)
-				world.addParticle(new GoopParticleEffect(color, totalScale * 2.5f, dir, mature),
-						pos.getX() + dir.x * offset.x, y + dir.y * offset.y, z + dir.z * offset.z,
-						0, 0, 0);
-			else if(dir.z != 0)
-				world.addParticle(new GoopParticleEffect(color, totalScale * 2.5f, dir, mature),
-						x + dir.x * offset.x, y + dir.y * offset.y, pos.getZ() + dir.z * offset.z,
-						0, 0, 0);
+			try
+			{
+				if(dir.y != 0)
+					world.addParticle(getConstructor(getEffect(effectOverride)).newInstance(color, totalScale * 2.5f, dir, mature, extraData),
+							x + dir.x * offset.x, pos.getY() + dir.y * offset.y, z + dir.z * offset.z,
+							0, 0, 0);
+				else if(dir.x != 0)
+					world.addParticle(getConstructor(getEffect(effectOverride)).newInstance(color, totalScale * 2.5f, dir, mature, extraData),
+							pos.getX() + dir.x * offset.x, y + dir.y * offset.y, z + dir.z * offset.z,
+							0, 0, 0);
+				else if(dir.z != 0)
+					world.addParticle(getConstructor(getEffect(effectOverride)).newInstance(color, totalScale * 2.5f, dir, mature, extraData),
+							x + dir.x * offset.x, y + dir.y * offset.y, pos.getZ() + dir.z * offset.z,
+							0, 0, 0);
+			}
+			catch (InvocationTargetException | InstantiationException | IllegalAccessException e)
+			{
+				Goop.LOGGER.error(e.getMessage());
+			}
 		}
 	}
 	
@@ -120,7 +168,7 @@ public class GoopDropParticle extends SpriteBillboardParticle
 		public Particle createParticle(GoopDropParticleEffect parameters, ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ)
 		{
 			return new GoopDropParticle(world, new Vec3d(x, y, z), new Vec3d(velocityX, velocityY, velocityZ),
-					spriteProvider, parameters.getColor(), parameters.getScale(), parameters.isMature());
+					spriteProvider, parameters.getColor(), parameters.getScale(), parameters.isMature(), parameters.getEffectOverride(), parameters.getExtraData());
 		}
 	}
 }

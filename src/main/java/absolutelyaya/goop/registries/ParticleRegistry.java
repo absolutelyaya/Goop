@@ -1,6 +1,7 @@
 package absolutelyaya.goop.registries;
 
 import absolutelyaya.goop.Goop;
+import absolutelyaya.goop.particles.EggGoopParticleEffect;
 import absolutelyaya.goop.particles.GoopDropParticleEffect;
 import absolutelyaya.goop.particles.GoopParticleEffect;
 import absolutelyaya.goop.particles.GoopStringParticleEffect;
@@ -21,9 +22,7 @@ public class ParticleRegistry
 	public static final ParticleType<GoopStringParticleEffect> GOOP_STRING =
 			Registry.register(Registries.PARTICLE_TYPE, new Identifier(Goop.MOD_ID, "goop_string"),
 					FabricParticleTypes.complex(new GoopStringParticleEffect.Factory()));
-	
-	public static void init()
-	{
-	
-	}
+	public static final ParticleType<EggGoopParticleEffect> EGG_GOOP =
+			Registry.register(Registries.PARTICLE_TYPE, new Identifier(Goop.MOD_ID, "egg_goop"),
+					FabricParticleTypes.complex(new EggGoopParticleEffect.Factory()));
 }

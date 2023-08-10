@@ -1,5 +1,6 @@
 package absolutelyaya.goop.particles;
 
+import absolutelyaya.goop.api.ExtraGoopData;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.network.PacketByteBuf;
@@ -15,17 +16,18 @@ public abstract class AbstractGoopParticleEffect implements ParticleEffect
 	protected final Vec3d color;
 	protected final float scale;
 	protected final boolean mature;
+	protected final ExtraGoopData extraGoopData;
 	
-	public AbstractGoopParticleEffect(Vec3d color, float scale, boolean mature)
+	public AbstractGoopParticleEffect(Vec3d color, float scale, boolean mature, ExtraGoopData extraGoopData)
 	{
 		this.color = color;
 		this.scale = MathHelper.clamp(scale, 0.01f, 4f);
 		this.mature = mature;
+		this.extraGoopData = extraGoopData;
 	}
 	
 	public static Vec3d readVec3(StringReader reader) throws CommandSyntaxException
 	{
-		reader.expect(' ');
 		float f = reader.readFloat();
 		reader.expect(' ');
 		float g = reader.readFloat();
@@ -47,6 +49,8 @@ public abstract class AbstractGoopParticleEffect implements ParticleEffect
 		buf.writeFloat((float)this.color.getZ());
 		buf.writeFloat(this.scale);
 		buf.writeBoolean(this.mature);
+		if(extraGoopData != null)
+			extraGoopData.write(buf);
 	}
 	
 	public String asString()
@@ -66,5 +70,10 @@ public abstract class AbstractGoopParticleEffect implements ParticleEffect
 	public boolean isMature()
 	{
 		return mature;
+	}
+	
+	public ExtraGoopData getExtraData()
+	{
+		return extraGoopData;
 	}
 }

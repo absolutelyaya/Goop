@@ -1,11 +1,17 @@
 package absolutelyaya.goop.registries;
 
 import absolutelyaya.goop.Goop;
+import absolutelyaya.goop.api.ExtraGoopData;
+import absolutelyaya.goop.api.GoopEmitterRegistry;
+import absolutelyaya.goop.api.WaterHandling;
 import absolutelyaya.goop.particles.GoopDropParticleEffect;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
+
+import java.lang.reflect.InvocationTargetException;
 
 public class PacketRegistry
 {
@@ -21,13 +27,37 @@ public class PacketRegistry
 			int amount = buf.readInt();
 			float size = buf.readFloat();
 			boolean mature = buf.readBoolean();
+			WaterHandling waterHandling = buf.readEnumConstant(WaterHandling.class);
+			
+			boolean isOverridden = buf.readBoolean();
+			Identifier effectOverride = isOverridden ? buf.readIdentifier() : null;
+			ExtraGoopData data;
+			if(isOverridden)
+			{
+				try
+				{
+					data = (ExtraGoopData)GoopEmitterRegistry.getExtraDataType(buf.readIdentifier()).getMethod("read", PacketByteBuf.class).invoke(null, buf);
+				}
+				catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e)
+				{
+					throw new RuntimeException(e);
+				}
+			}
+			else
+				data = new ExtraGoopData();
+			
 			MinecraftClient.getInstance().execute(() -> {
 				if(client.world == null)
 					return;
 				for (int i = 0; i < amount; i++)
 				{
 					Vec3d vel = baseVel.addRandom(client.world.random, randomness);
-					client.world.addParticle(new GoopDropParticleEffect(Vec3d.unpackRgb(color), size, mature), pos.x, pos.y, pos.z, vel.x, vel.y, vel.z);
+					if(isOverridden)
+						client.world.addParticle(new GoopDropParticleEffect(Vec3d.unpackRgb(color), size, mature, effectOverride, data),
+								pos.x, pos.y, pos.z, vel.x, vel.y, vel.z);
+					else
+						client.world.addParticle(new GoopDropParticleEffect(Vec3d.unpackRgb(color), size, mature),
+								pos.x, pos.y, pos.z, vel.x, vel.y, vel.z);
 				}
 			});
 		}));

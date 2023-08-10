@@ -12,7 +12,7 @@ public class GoopStringParticleEffect extends AbstractGoopParticleEffect
 {
 	public GoopStringParticleEffect(Vec3d color, float scale, boolean mature)
 	{
-		super(color, scale, mature);
+		super(color, scale, mature, null);
 	}
 	
 	@Override
@@ -26,6 +26,7 @@ public class GoopStringParticleEffect extends AbstractGoopParticleEffect
 		@Override
 		public GoopStringParticleEffect read(ParticleType type, StringReader reader) throws CommandSyntaxException
 		{
+			reader.expect(' ');
 			Vec3d color = AbstractGoopParticleEffect.readVec3(reader);
 			reader.expect(' ');
 			float size = reader.readFloat();

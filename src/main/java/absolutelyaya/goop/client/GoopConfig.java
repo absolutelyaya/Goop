@@ -4,7 +4,6 @@ import absolutelyaya.goop.Goop;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
-import net.minecraft.util.math.Vec3d;
 
 @Config(name = Goop.MOD_ID)
 @Config.Gui.Background("minecraft:textures/block/light_blue_terracotta.png")

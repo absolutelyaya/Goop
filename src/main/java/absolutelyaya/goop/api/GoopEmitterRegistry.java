@@ -3,12 +3,15 @@ package absolutelyaya.goop.api;
 import absolutelyaya.goop.Goop;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;
 
 public class GoopEmitterRegistry
 {
+	static final Map<Identifier, Class<ExtraGoopData>> ExtraDataTypes = new HashMap<>();
+	
 	static final Map<EntityType<? extends LivingEntity>, List<DamageGoopEmitter<? extends LivingEntity>>> DamageGoopEmitters = new HashMap<>();
 	static final Map<EntityType<? extends LivingEntity>, List<DeathGoopEmitter<? extends LivingEntity>>> DeathGoopEmitters = new HashMap<>();
 	static final Map<EntityType<? extends LivingEntity>, List<LandingGoopEmitter<? extends LivingEntity>>> LandingGoopEmitters = new HashMap<>();
@@ -21,7 +24,7 @@ public class GoopEmitterRegistry
 	 * @see absolutelyaya.goop.api.DamageGoopEmitter
 	 * @see absolutelyaya.goop.api.LandingGoopEmitter
 	 */
-	public static void register(EntityType<? extends LivingEntity> entityType, IGoopEmitter emitter)
+	public static void registerEmitter(EntityType<? extends LivingEntity> entityType, IGoopEmitter emitter)
 	{
 		if(frozen)
 		{
@@ -29,16 +32,16 @@ public class GoopEmitterRegistry
 			return;
 		}
 		if(emitter instanceof DamageGoopEmitter<?> damageEmitter)
-			registerInternal(DamageGoopEmitters, entityType, damageEmitter);
+			registerEmitterInternal(DamageGoopEmitters, entityType, damageEmitter);
 		else if (emitter instanceof LandingGoopEmitter<?> landingEmitter)
-			registerInternal(LandingGoopEmitters, entityType, landingEmitter);
+			registerEmitterInternal(LandingGoopEmitters, entityType, landingEmitter);
 		else if(emitter instanceof DeathGoopEmitter<?> deathEmitter)
-			registerInternal(DeathGoopEmitters, entityType, deathEmitter);
+			registerEmitterInternal(DeathGoopEmitters, entityType, deathEmitter);
 	}
 	
-	private static <T extends IGoopEmitter> void registerInternal(Map<EntityType<? extends LivingEntity>, List<T>> map,
-								 EntityType<? extends LivingEntity> entityType,
-								 T emitter)
+	private static <T extends IGoopEmitter> void registerEmitterInternal(Map<EntityType<? extends LivingEntity>, List<T>> map,
+																		 EntityType<? extends LivingEntity> entityType,
+																		 T emitter)
 	{
 		if(!map.containsKey(entityType))
 			map.put(entityType, new ArrayList<>());
@@ -70,9 +73,32 @@ public class GoopEmitterRegistry
 		return Optional.of(LandingGoopEmitters.get(entityType));
 	}
 	
+	public static void registerExtraDataType(Identifier id, Class<ExtraGoopData> clazz)
+	{
+		if(ExtraDataTypes.containsKey(id))
+		{
+			Goop.LogWarning(String.format("Already registered extra data type as %s!", id));
+			return;
+		}
+		ExtraDataTypes.put(id, clazz);
+	}
+	
+	public static Class<ExtraGoopData> getExtraDataType(Identifier identifier)
+	{
+		if(ExtraDataTypes.containsKey(identifier))
+			return ExtraDataTypes.get(identifier);
+		Goop.LOGGER.error(String.format("Extra Goop Data Type %s isn't registered!", identifier));
+		return null;
+	}
+	
 	@ApiStatus.Internal
 	public static void freeze()
 	{
 		frozen = true;
+	}
+	
+	static
+	{
+		registerExtraDataType(new Identifier(Goop.MOD_ID, "default"), ExtraGoopData.class);
 	}
 }
