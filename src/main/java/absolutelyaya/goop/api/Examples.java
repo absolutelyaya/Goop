@@ -5,6 +5,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.mob.ZombieEntity;
+import net.minecraft.entity.passive.SnowGolemEntity;
 import net.minecraft.util.math.MathHelper;
 import org.joml.Vector4f;
 
@@ -45,6 +46,17 @@ public class Examples implements GoopInitializer
 				(zombie, data) -> MathHelper.clamp(data.amount() / 4f, 0.25f, 1),
 				true,
 				WaterHandling.REPLACE_WITH_CLOUD_PARTICLE
+		));
+		
+		//This causes Snow Golems to melt into blue Goop upon Death.
+		//Since the particle is supposed to resemble water, it will simply disappear when making content with actual Water.
+		GoopEmitterRegistry.register(EntityType.SNOW_GOLEM, new DeathGoopEmitter<SnowGolemEntity>(
+				(snowGolem, data) -> 0x4690da,
+				(snowGolem, data) -> new Vector4f(0f, 0f, 0f, 0.5f),
+				(snowGolem, data) -> 2 + snowGolem.getRandom().nextInt(4),
+				(snowGolem, data) -> 0.5f + snowGolem.getRandom().nextFloat() / 0.5f,
+				false,
+				WaterHandling.REMOVE_PARTICLE
 		));
 	}
 }

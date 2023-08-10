@@ -10,11 +10,12 @@ import java.util.*;
 public class GoopEmitterRegistry
 {
 	static final Map<EntityType<? extends LivingEntity>, List<DamageGoopEmitter<? extends LivingEntity>>> DamageGoopEmitters = new HashMap<>();
+	static final Map<EntityType<? extends LivingEntity>, List<DeathGoopEmitter<? extends LivingEntity>>> DeathGoopEmitters = new HashMap<>();
 	static final Map<EntityType<? extends LivingEntity>, List<LandingGoopEmitter<? extends LivingEntity>>> LandingGoopEmitters = new HashMap<>();
 	static boolean frozen = false;
 	
 	/**
-	 * Registers a new Goop Emitter. Please only register new Emitters in the GoopAPI Entrypoint!
+	 * Registers a new Goop Emitter. Please only register new Emitters in the "goop" Entrypoint!
 	 * @param entityType Entity to register as an Emitter
 	 * @param emitter The Emitter
 	 * @see absolutelyaya.goop.api.DamageGoopEmitter
@@ -24,13 +25,15 @@ public class GoopEmitterRegistry
 	{
 		if(frozen)
 		{
-			Goop.LogWarning("Tried to register a new Goop Emitter after Registry was frozen. Please only register Goop Emitters via the GoopAPI Entrypoint!");
+			Goop.LogWarning("Tried to register a new Goop Emitter after Registry was frozen. Please only register Goop Emitters via the \"goop\" Entrypoint!");
 			return;
 		}
-		if(emitter instanceof DamageGoopEmitter<?> dge)
-			registerInternal(DamageGoopEmitters, entityType, dge);
-		else if (emitter instanceof LandingGoopEmitter<?> lge)
-			registerInternal(LandingGoopEmitters, entityType, lge);
+		if(emitter instanceof DamageGoopEmitter<?> damageEmitter)
+			registerInternal(DamageGoopEmitters, entityType, damageEmitter);
+		else if (emitter instanceof LandingGoopEmitter<?> landingEmitter)
+			registerInternal(LandingGoopEmitters, entityType, landingEmitter);
+		else if(emitter instanceof DeathGoopEmitter<?> deathEmitter)
+			registerInternal(DeathGoopEmitters, entityType, deathEmitter);
 	}
 	
 	private static <T extends IGoopEmitter> void registerInternal(Map<EntityType<? extends LivingEntity>, List<T>> map,
@@ -49,6 +52,14 @@ public class GoopEmitterRegistry
 		if(!DamageGoopEmitters.containsKey(entityType))
 			return Optional.empty();
 		return Optional.of(DamageGoopEmitters.get(entityType));
+	}
+	
+	@ApiStatus.Internal
+	public static Optional<List<DeathGoopEmitter<?>>> getDeathEmitters(EntityType<? extends LivingEntity> entityType)
+	{
+		if(!DeathGoopEmitters.containsKey(entityType))
+			return Optional.empty();
+		return Optional.of(DeathGoopEmitters.get(entityType));
 	}
 	
 	@ApiStatus.Internal

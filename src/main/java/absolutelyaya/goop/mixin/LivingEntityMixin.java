@@ -1,9 +1,6 @@
 package absolutelyaya.goop.mixin;
 
-import absolutelyaya.goop.api.DamageData;
-import absolutelyaya.goop.api.DamageGoopEmitter;
-import absolutelyaya.goop.api.GoopEmitterRegistry;
-import absolutelyaya.goop.api.LandingGoopEmitter;
+import absolutelyaya.goop.api.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -12,11 +9,13 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 import java.util.Optional;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity
 {
@@ -37,22 +36,34 @@ public abstract class LivingEntityMixin extends Entity
 			emitter.emit((LivingEntity)(Object)this, new DamageData(source, amount));
 	}
 	
+	@Inject(method = "onDeath", at = @At(value = "RETURN"))
+	void onDeath(DamageSource damageSource, CallbackInfo ci)
+	{
+		if(getWorld().isClient)
+			return;
+		Optional<List<DeathGoopEmitter<?>>> emitters = GoopEmitterRegistry.getDeathEmitters((EntityType<? extends LivingEntity>)getType());
+		if(emitters.isEmpty())
+			return;
+		for (DeathGoopEmitter emitter : emitters.get())
+			emitter.emit((LivingEntity)(Object)this, damageSource);
+	}
+	
 	@Override
 	public void onLanding()
 	{
-		if(getWorld().isClient || fallDistance < 0.05)
+		if (getWorld().isClient || fallDistance < 0.05)
 		{
 			super.onLanding();
 			return;
 		}
-		Optional<List<LandingGoopEmitter<?>>> emitters = GoopEmitterRegistry.getLandingEmitters((EntityType<? extends LivingEntity>)getType());
-		if(emitters.isEmpty())
+		Optional<List<LandingGoopEmitter<?>>> emitters = GoopEmitterRegistry.getLandingEmitters((EntityType<? extends LivingEntity>) getType());
+		if (emitters.isEmpty())
 		{
 			super.onLanding();
 			return;
 		}
 		for (LandingGoopEmitter emitter : emitters.get())
-			emitter.emit((LivingEntity)(Object)this, fallDistance);
+			emitter.emit((LivingEntity) (Object) this, fallDistance);
 		super.onLanding();
 	}
 }
