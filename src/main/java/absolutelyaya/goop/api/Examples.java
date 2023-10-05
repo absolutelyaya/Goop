@@ -67,6 +67,6 @@ public class Examples implements GoopInitializer
 				},
 				(egg, data) -> 1,
 				(egg, data) -> 0.5f
-		).markMature().setParticleEffectOverride(new Identifier(Goop.MOD_ID, "egg_goop"), new ExtraGoopData()));
+		).setParticleEffectOverride(new Identifier(Goop.MOD_ID, "egg_goop"), new ExtraGoopData()));
 	}
 }

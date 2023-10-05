@@ -149,7 +149,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 					//check if block below center of face is air or not solid
 					Vec3d v = camPos.add(faceCenter);
 					BlockPos pos = new BlockPos((int)v.x, (int)v.y, (int)v.z);
-					render = world.getBlockState(pos.down()).isSolidBlock(world, pos.down()) && !world.getBlockState(pos).isSolidBlock(world, pos);
+					render = world.getBlockState(pos.down()).isFullCube(world, pos.down()) && !world.getBlockState(pos).isFullCube(world, pos);
 					if(!render)
 						faceShouldRender.set(vi, false); //so faces don't reappear after being removed
 					
@@ -161,14 +161,14 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 								0, 0.05, 0);
 					}
 					
-					if(config.wrapToEdges)
+					if(config.wrapToEdges && this.targetSize >= 2)
 					{
 						for (int i = 0; i < faceVerts.length; i++)
 						{
 							Vec3d mv = faceVerts[i];
 							mv = mv.add(camPos);
 							BlockPos vpos = new BlockPos((int)mv.x, (int)mv.y, (int)mv.z);
-							if((world.isAir(vpos.down()) || world.getBlockState(pos).isSolidBlock(world, pos)) && this.targetSize >= 2)
+							if(world.isAir(vpos.down()) || world.getBlockState(pos).isFullCube(world, pos))
 								mv = moveToBlockEdge(mv);
 							faceVerts[i] = mv.subtract(camPos);
 						}
