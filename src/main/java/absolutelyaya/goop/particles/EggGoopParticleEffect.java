@@ -2,6 +2,7 @@ package absolutelyaya.goop.particles;
 
 import absolutelyaya.goop.api.ExtraGoopData;
 import absolutelyaya.goop.api.IGoopEffectFactory;
+import absolutelyaya.goop.api.WaterHandling;
 import absolutelyaya.goop.registries.ParticleRegistry;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -19,9 +20,9 @@ public class EggGoopParticleEffect extends GoopParticleEffect
 	 * @param mature    Whether the Particle is Mature Content
 	 * @param extraData Extra Arguments for custom Particle Effects extending this Class.
 	 */
-	public EggGoopParticleEffect(Vec3d color, float scale, Vec3d dir, boolean mature, ExtraGoopData extraData)
+	public EggGoopParticleEffect(Vec3d color, float scale, Vec3d dir, boolean mature, WaterHandling waterHandling, ExtraGoopData extraData)
 	{
-		super(color, scale, dir, mature, extraData);
+		super(color, scale, dir, mature, waterHandling, extraData);
 	}
 	
 	@Override
@@ -43,13 +44,14 @@ public class EggGoopParticleEffect extends GoopParticleEffect
 			Vec3d dir = readVec3(reader);
 			reader.expect(' ');
 			boolean mature = reader.readBoolean();
-			return new EggGoopParticleEffect(color, scale, dir, mature, new ExtraGoopData());
+			return new EggGoopParticleEffect(color, scale, dir, mature, WaterHandling.REPLACE_WITH_CLOUD_PARTICLE, new ExtraGoopData());
 		}
 		
 		@Override
 		public EggGoopParticleEffect read(ParticleType type, PacketByteBuf buf)
 		{
-			return new EggGoopParticleEffect(readVec3(buf), buf.readFloat(), readVec3(buf), buf.readBoolean(), ExtraGoopData.read(buf));
+			return new EggGoopParticleEffect(readVec3(buf), buf.readFloat(), readVec3(buf), buf.readBoolean(),
+					buf.readEnumConstant(WaterHandling.class), ExtraGoopData.read(buf));
 		}
 		
 		@Override

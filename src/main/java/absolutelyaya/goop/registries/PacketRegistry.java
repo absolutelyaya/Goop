@@ -53,10 +53,10 @@ public class PacketRegistry
 				{
 					Vec3d vel = baseVel.addRandom(client.world.random, randomness);
 					if(isOverridden)
-						client.world.addParticle(new GoopDropParticleEffect(Vec3d.unpackRgb(color), size, mature, effectOverride, data),
+						client.world.addParticle(new GoopDropParticleEffect(Vec3d.unpackRgb(color), size, mature, waterHandling, effectOverride, data),
 								pos.x, pos.y, pos.z, vel.x, vel.y, vel.z);
 					else
-						client.world.addParticle(new GoopDropParticleEffect(Vec3d.unpackRgb(color), size, mature),
+						client.world.addParticle(new GoopDropParticleEffect(Vec3d.unpackRgb(color), size, mature, waterHandling),
 								pos.x, pos.y, pos.z, vel.x, vel.y, vel.z);
 				}
 			});

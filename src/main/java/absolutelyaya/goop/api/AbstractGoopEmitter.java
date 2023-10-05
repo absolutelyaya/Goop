@@ -56,7 +56,7 @@ public abstract class AbstractGoopEmitter<T extends Entity> implements IGoopEmit
 	protected void emitInternal(T entity, int color, Vector4f velocity, int amount, float scale, WaterHandling waterHandling)
 	{
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-		buf.writeVector3f(entity.getPos().add(0, entity.getHeight() / 2, 0).toVector3f());
+		buf.writeVector3f(entity.getPos().add(0, entity.getHeight() / 2, 0).subtract(entity.getVelocity().multiply(0.2f)).toVector3f());
 		buf.writeInt(color);
 		buf.writeVector3f(new Vector3f(velocity.x, velocity.y, velocity.z));
 		buf.writeFloat(velocity.w);

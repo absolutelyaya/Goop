@@ -1,10 +1,14 @@
 package absolutelyaya.goop.particles;
 
+import absolutelyaya.goop.api.WaterHandling;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.ParticleTextureSheet;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.particle.DustParticleEffect;
+import net.minecraft.registry.tag.FluidTags;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
@@ -20,9 +24,10 @@ public class GoopParticle extends SurfaceAlignedParticle
 	private final float size;
 	private final float normalAlpha;
 	private final int appearTicks;
-	boolean mature;
+	final boolean mature;
+	final WaterHandling waterHandling;
 	
-	protected GoopParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider, Vec3d color, float scale, Vec3d dir, boolean mature)
+	protected GoopParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider, Vec3d color, float scale, Vec3d dir, boolean mature, WaterHandling waterHandling)
 	{
 		super(world, x, y, z, spriteProvider, color, scale, dir);
 		this.maxAge = config.permanent ? Integer.MAX_VALUE : 200 + random.nextInt(100);
@@ -33,6 +38,7 @@ public class GoopParticle extends SurfaceAlignedParticle
 		this.normalAlpha = alpha;
 		this.appearTicks = random.nextInt(4) + 3;
 		this.mature = mature;
+		this.waterHandling = waterHandling;
 		GOOP_QUEUE.add(this);
 		if(GOOP_QUEUE.size() > config.goopCap)
 			GOOP_QUEUE.remove().markDead();
@@ -61,6 +67,24 @@ public class GoopParticle extends SurfaceAlignedParticle
 			world.addParticle(new GoopStringParticleEffect(color, 0.25f, mature),
 					x + random.nextFloat() * scale - scale / 2f, y + (y < 0 ? 1 : 0), z + random.nextFloat() * scale - scale / 2f,
 					0, 0, 0);
+		
+		if(world.getFluidState(new BlockPos((int)x, (int)y, (int)z)).isIn(FluidTags.LAVA))
+			markDead();
+		if(waterHandling == WaterHandling.IGNORE)
+			return;
+		if(world.isWater(new BlockPos((int)x, (int)y, (int)z)))
+		{
+			switch(waterHandling)
+			{
+				case REMOVE_PARTICLE -> markDead();
+				case REPLACE_WITH_CLOUD_PARTICLE ->
+				{
+					world.addParticle(new DustParticleEffect(color.toVector3f(), scale), x, y, z,
+							random.nextFloat() * 0.1f, random.nextFloat() * 0.1f, random.nextFloat() * 0.1f);
+					markDead();
+				}
+			}
+		}
 	}
 	
 	@Override
@@ -83,7 +107,7 @@ public class GoopParticle extends SurfaceAlignedParticle
 		@Override
 		public Particle createParticle(GoopParticleEffect parameters, ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ)
 		{
-			return new GoopParticle(world, x, y, z, spriteProvider, parameters.getColor(), parameters.getScale(), parameters.getDir(), parameters.isMature());
+			return new GoopParticle(world, x, y, z, spriteProvider, parameters.getColor(), parameters.getScale(), parameters.getDir(), parameters.isMature(), parameters.getWaterHandling());
 		}
 	}
 }

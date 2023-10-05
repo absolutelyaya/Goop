@@ -1,6 +1,7 @@
 package absolutelyaya.goop.particles;
 
 import absolutelyaya.goop.api.ExtraGoopData;
+import absolutelyaya.goop.api.WaterHandling;
 import absolutelyaya.goop.registries.ParticleRegistry;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -14,14 +15,14 @@ public class GoopDropParticleEffect extends AbstractGoopParticleEffect
 {
 	Identifier effectOverride;
 	
-	public GoopDropParticleEffect(Vec3d color, float scale, boolean mature)
+	public GoopDropParticleEffect(Vec3d color, float scale, boolean mature, WaterHandling waterHandling)
 	{
-		super(color, scale, mature, null);
+		super(color, scale, mature, null, waterHandling);
 	}
 	
-	public GoopDropParticleEffect(Vec3d color, float scale, boolean mature, Identifier effectOverride, ExtraGoopData extraData)
+	public GoopDropParticleEffect(Vec3d color, float scale, boolean mature, WaterHandling waterHandling, Identifier effectOverride, ExtraGoopData extraData)
 	{
-		super(color, scale, mature, extraData);
+		super(color, scale, mature, extraData, waterHandling);
 		this.effectOverride = effectOverride;
 	}
 	
@@ -47,7 +48,7 @@ public class GoopDropParticleEffect extends AbstractGoopParticleEffect
 			float size = reader.readFloat();
 			reader.expect(' ');
 			boolean mature = reader.readBoolean();
-			return new GoopDropParticleEffect(color, size, mature);
+			return new GoopDropParticleEffect(color, size, mature, WaterHandling.REPLACE_WITH_CLOUD_PARTICLE);
 		}
 		
 		@Override
@@ -56,11 +57,10 @@ public class GoopDropParticleEffect extends AbstractGoopParticleEffect
 			Vec3d color = readVec3(buf);
 			float scale = buf.readFloat();
 			boolean mature = buf.readBoolean();
+			WaterHandling waterHandling = buf.readEnumConstant(WaterHandling.class);
 			if(buf.readBoolean())
-			{
-				return new GoopDropParticleEffect(color, scale, mature, buf.readIdentifier(), ExtraGoopData.read(buf));
-			}
-			return new GoopDropParticleEffect(readVec3(buf), buf.readFloat(), buf.readBoolean());
+				return new GoopDropParticleEffect(color, scale, mature, waterHandling, buf.readIdentifier(), ExtraGoopData.read(buf));
+			return new GoopDropParticleEffect(color, scale, mature, waterHandling);
 		}
 	}
 }

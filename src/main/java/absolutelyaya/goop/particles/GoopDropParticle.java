@@ -3,17 +3,20 @@ package absolutelyaya.goop.particles;
 import absolutelyaya.goop.Goop;
 import absolutelyaya.goop.api.ExtraGoopData;
 import absolutelyaya.goop.api.IGoopEffectFactory;
+import absolutelyaya.goop.api.WaterHandling;
 import absolutelyaya.goop.client.GoopClient;
 import absolutelyaya.goop.client.GoopConfig;
 import absolutelyaya.goop.registries.ParticleRegistry;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
+import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.math.BlockPos;
@@ -39,8 +42,9 @@ public class GoopDropParticle extends SpriteBillboardParticle
 	final float totalScale;
 	final Identifier effectOverride;
 	final ExtraGoopData extraData;
+	final WaterHandling waterHandling;
 	
-	protected GoopDropParticle(ClientWorld clientWorld, Vec3d pos, Vec3d vel, SpriteProvider spriteProvider, Vec3d color, float scale, boolean mature, Identifier effectOverride, ExtraGoopData extraData)
+	protected GoopDropParticle(ClientWorld clientWorld, Vec3d pos, Vec3d vel, SpriteProvider spriteProvider, Vec3d color, float scale, boolean mature, WaterHandling waterHandling, Identifier effectOverride, ExtraGoopData extraData)
 	{
 		super(clientWorld, pos.x, pos.y, pos.z);
 		GoopConfig config = GoopClient.getConfig();
@@ -58,6 +62,7 @@ public class GoopDropParticle extends SpriteBillboardParticle
 		maxAge = 300;
 		setVelocity(random.nextFloat() * 0.5 - 0.25, random.nextFloat() * 0.5, random.nextFloat() * 0.5 - 0.25);
 		collidesWithWorld = true;
+		this.waterHandling = waterHandling;
 		
 		rotSpeed = (random.nextFloat() - 0.5f) * 0.25f;
 		
@@ -77,6 +82,23 @@ public class GoopDropParticle extends SpriteBillboardParticle
 		super.tick();
 		prevAngle = angle;
 		angle += rotSpeed;
+		if(world.getFluidState(new BlockPos((int)x, (int)y, (int)z)).isIn(FluidTags.LAVA))
+			markDead();
+		if(waterHandling == WaterHandling.IGNORE)
+			return;
+		if(world.isWater(new BlockPos((int)x, (int)y, (int)z)))
+		{
+			switch(waterHandling)
+			{
+				case REMOVE_PARTICLE -> markDead();
+				case REPLACE_WITH_CLOUD_PARTICLE ->
+				{
+					world.addParticle(new DustParticleEffect(color.toVector3f(), totalScale * 2.5f), x, y, z,
+							random.nextFloat() * 0.1f, random.nextFloat() * 0.1f, random.nextFloat() * 0.1f);
+					markDead();
+				}
+			}
+		}
 	}
 	
 	ParticleType<GoopParticleEffect> getEffect(Identifier override)
@@ -92,7 +114,7 @@ public class GoopDropParticle extends SpriteBillboardParticle
 	{
 		try
 		{
-			return ((IGoopEffectFactory)type.getParametersFactory()).getParticleEffectClass().getConstructor(Vec3d.class, float.class, Vec3d.class, boolean.class, ExtraGoopData.class);
+			return ((IGoopEffectFactory)type.getParametersFactory()).getParticleEffectClass().getConstructor(Vec3d.class, float.class, Vec3d.class, boolean.class, WaterHandling.class, ExtraGoopData.class);
 		}
 		catch (NoSuchMethodException e)
 		{
@@ -114,15 +136,15 @@ public class GoopDropParticle extends SpriteBillboardParticle
 			try
 			{
 				if(dir.y != 0)
-					world.addParticle(getConstructor(getEffect(effectOverride)).newInstance(color, totalScale * 2.5f, dir, mature, extraData),
+					world.addParticle(getConstructor(getEffect(effectOverride)).newInstance(color, totalScale * 2.5f, dir, mature, waterHandling, extraData),
 							x + dir.x * offset.x, pos.getY() + dir.y * offset.y, z + dir.z * offset.z,
 							0, 0, 0);
 				else if(dir.x != 0)
-					world.addParticle(getConstructor(getEffect(effectOverride)).newInstance(color, totalScale * 2.5f, dir, mature, extraData),
+					world.addParticle(getConstructor(getEffect(effectOverride)).newInstance(color, totalScale * 2.5f, dir, mature, waterHandling, extraData),
 							pos.getX() + dir.x * offset.x, y + dir.y * offset.y, z + dir.z * offset.z,
 							0, 0, 0);
 				else if(dir.z != 0)
-					world.addParticle(getConstructor(getEffect(effectOverride)).newInstance(color, totalScale * 2.5f, dir, mature, extraData),
+					world.addParticle(getConstructor(getEffect(effectOverride)).newInstance(color, totalScale * 2.5f, dir, mature, waterHandling, extraData),
 							x + dir.x * offset.x, y + dir.y * offset.y, pos.getZ() + dir.z * offset.z,
 							0, 0, 0);
 			}
@@ -168,7 +190,8 @@ public class GoopDropParticle extends SpriteBillboardParticle
 		public Particle createParticle(GoopDropParticleEffect parameters, ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ)
 		{
 			return new GoopDropParticle(world, new Vec3d(x, y, z), new Vec3d(velocityX, velocityY, velocityZ),
-					spriteProvider, parameters.getColor(), parameters.getScale(), parameters.isMature(), parameters.getEffectOverride(), parameters.getExtraData());
+					spriteProvider, parameters.getColor(), parameters.getScale(), parameters.isMature(), parameters.getWaterHandling(),
+					parameters.getEffectOverride(), parameters.getExtraData());
 		}
 	}
 }

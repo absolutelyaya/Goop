@@ -1,5 +1,6 @@
 package absolutelyaya.goop.particles;
 
+import absolutelyaya.goop.api.WaterHandling;
 import absolutelyaya.goop.registries.ParticleRegistry;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -12,7 +13,7 @@ public class GoopStringParticleEffect extends AbstractGoopParticleEffect
 {
 	public GoopStringParticleEffect(Vec3d color, float scale, boolean mature)
 	{
-		super(color, scale, mature, null);
+		super(color, scale, mature, null, WaterHandling.IGNORE);
 	}
 	
 	@Override

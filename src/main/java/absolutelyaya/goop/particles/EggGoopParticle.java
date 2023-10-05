@@ -1,5 +1,6 @@
 package absolutelyaya.goop.particles;
 
+import absolutelyaya.goop.api.WaterHandling;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.SpriteProvider;
@@ -9,9 +10,9 @@ import org.jetbrains.annotations.Nullable;
 
 public class EggGoopParticle extends GoopParticle
 {
-	protected EggGoopParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider, Vec3d color, float scale, Vec3d dir, boolean mature)
+	protected EggGoopParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider, Vec3d color, float scale, Vec3d dir, boolean mature, WaterHandling waterHandling)
 	{
-		super(world, x, y, z, spriteProvider, color, scale, dir, mature);
+		super(world, x, y, z, spriteProvider, color, scale, dir, mature, waterHandling);
 	}
 	
 	public static class Factory implements ParticleFactory<EggGoopParticleEffect>
@@ -27,7 +28,8 @@ public class EggGoopParticle extends GoopParticle
 		@Override
 		public Particle createParticle(EggGoopParticleEffect parameters, ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ)
 		{
-			return new EggGoopParticle(world, x, y, z, spriteProvider, parameters.getColor(), parameters.getScale(), parameters.getDir(), parameters.isMature());
+			return new EggGoopParticle(world, x, y, z, spriteProvider, parameters.getColor(), parameters.getScale(), parameters.getDir(),
+					parameters.isMature(), parameters.getWaterHandling());
 		}
 	}
 }
