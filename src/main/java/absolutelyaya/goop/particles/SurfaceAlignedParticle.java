@@ -2,6 +2,7 @@ package absolutelyaya.goop.particles;
 
 import absolutelyaya.goop.client.GoopClient;
 import absolutelyaya.goop.client.GoopConfig;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.particle.SpriteBillboardParticle;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.render.Camera;
@@ -92,7 +93,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 	@Override
 	public void buildGeometry(VertexConsumer vertexConsumer, Camera camera, float tickDelta)
 	{
-		boolean debug = config.goopDebug;
+		boolean debug = config.goopDebug && !MinecraftClient.getInstance().isPaused();
 		if(verts.size() == 0)
 			return;
 		

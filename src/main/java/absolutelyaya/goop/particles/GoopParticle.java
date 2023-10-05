@@ -1,6 +1,8 @@
 package absolutelyaya.goop.particles;
 
 import absolutelyaya.goop.api.WaterHandling;
+import absolutelyaya.goop.client.GoopClient;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.ParticleTextureSheet;
@@ -26,6 +28,7 @@ public class GoopParticle extends SurfaceAlignedParticle
 	private final int appearTicks;
 	final boolean mature;
 	final WaterHandling waterHandling;
+	float rain;
 	
 	protected GoopParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider, Vec3d color, float scale, Vec3d dir, boolean mature, WaterHandling waterHandling)
 	{
@@ -55,6 +58,7 @@ public class GoopParticle extends SurfaceAlignedParticle
 	{
 		super.tick();
 		
+		//scale / alpha animations
 		if(age <= appearTicks)
 			scale = MathHelper.clampedLerp(0f, size, ((float)age / appearTicks));
 		else if(age >= maxAge - 60 && !config.permanent)
@@ -62,12 +66,25 @@ public class GoopParticle extends SurfaceAlignedParticle
 			scale = MathHelper.clampedLerp(size, size * 0.5f, (age - (maxAge - 60)) / 60f);
 			alpha = MathHelper.clampedLerp(normalAlpha, 0f, (age - (maxAge - 60)) / 60f);
 		}
-		
+		else
+		{
+			//Rain cleaning
+			if(GoopClient.getConfig().rainCleaning  && waterHandling != WaterHandling.IGNORE &&
+					   world.isRaining() && world.isSkyVisible(new BlockPos((int)x, (int)y, (int)z)))
+			{
+				rain = rain + 1f / 100f;
+				scale = MathHelper.clampedLerp(size, size * 1.25f, rain / 10f);
+				alpha = MathHelper.clampedLerp(normalAlpha, 0f, rain / 10f);
+				if(rain > 10f)
+					markDead();
+			}
+		}
+		//Ceiling Drips
 		if(dir.getY() < 0 && random.nextInt(120) == 0)
 			world.addParticle(new GoopStringParticleEffect(color, 0.25f, mature),
 					x + random.nextFloat() * scale - scale / 2f, y + (y < 0 ? 1 : 0), z + random.nextFloat() * scale - scale / 2f,
 					0, 0, 0);
-		
+		//Fluid handling
 		if(world.getFluidState(new BlockPos((int)x, (int)y, (int)z)).isIn(FluidTags.LAVA))
 			markDead();
 		if(waterHandling == WaterHandling.IGNORE)
