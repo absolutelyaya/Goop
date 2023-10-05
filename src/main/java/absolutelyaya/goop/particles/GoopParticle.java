@@ -2,7 +2,6 @@ package absolutelyaya.goop.particles;
 
 import absolutelyaya.goop.api.WaterHandling;
 import absolutelyaya.goop.client.GoopClient;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.ParticleTextureSheet;
