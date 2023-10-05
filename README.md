@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    include modApi('com.github.absolutelyaya:goop:fabric-1.20.1-v0.1')
+    include modImplementation('com.github.absolutelyaya:goop:fabric-1.20.1-v0.1')
 }
 ```
 And that's pretty much it. You can now use the Goop Particles as you want; You can spawn them like any other particle; or we do something a bit cleaner.
