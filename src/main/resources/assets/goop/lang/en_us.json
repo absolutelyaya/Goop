@@ -28,5 +28,8 @@
   "text.autoconfig.goop.option.rainCleaning.@Tooltip": "Washes away Goop Puddles directly under the sky when it rains.",
 
   "text.autoconfig.goop.option.goopDebug": "Goop Debug",
-  "text.autoconfig.goop.option.goopDebug.@Tooltip": "[WARNING] VERY LAGGY | Adds extra particles to show vertex info of goop puddles"
+  "text.autoconfig.goop.option.goopDebug.@Tooltip": "[WARNING] VERY LAGGY | Adds extra particles to show vertex info of goop puddles",
+
+  "text.autoconfig.goop.option.showDev": "Show Dev Particles",
+  "text.autoconfig.goop.option.showDev.@Tooltip": "Whether emitters marked as developer content should be visible. (All example emitters are marked as dev content for instance)"
 }

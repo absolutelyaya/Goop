@@ -100,6 +100,8 @@ Let's not start with effect overrides tho. I'd like to get more complex as we go
 This feature is intended to give Players the choice to disable VFX they might find distressing or gross. Please keep that in mind when adding Emitters and flag them accordingly.<br>
 To flag an Emitter as "Mature" Content, use ``.markMature()`` right after instantiating the emitter.<br>
 Already emitted particles won't be censored/uncensored retroactively if a client changes their settings. Rejoining the world will remove all existing Goop instantly though.
+### "Dev" Content flagging
+Dev Emitters (like all Example emitters for instance) will only emit Particles for players that have the "Show Dev Particles" Client Setting enabled.
 ### Water Handling
 Currently, there are three options how to handle contact with water:
 1. REMOVE_PARTICLE<br>The Default; Removes Goop the moment they make contact with Water.

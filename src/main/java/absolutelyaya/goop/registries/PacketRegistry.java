@@ -4,6 +4,7 @@ import absolutelyaya.goop.Goop;
 import absolutelyaya.goop.api.ExtraGoopData;
 import absolutelyaya.goop.api.GoopEmitterRegistry;
 import absolutelyaya.goop.api.WaterHandling;
+import absolutelyaya.goop.client.GoopClient;
 import absolutelyaya.goop.particles.GoopDropParticleEffect;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
@@ -20,6 +21,8 @@ public class PacketRegistry
 	public static void registerClient()
 	{
 		ClientPlayNetworking.registerGlobalReceiver(PacketRegistry.EMIT_GOOP_PACKET_ID, ((client, handler, buf, sender) -> {
+			if(buf.readBoolean() && !GoopClient.getConfig().showDev)
+				return;
 			Vec3d pos = new Vec3d(buf.readVector3f());
 			int color = buf.readInt();
 			Vec3d baseVel = new Vec3d(buf.readVector3f());

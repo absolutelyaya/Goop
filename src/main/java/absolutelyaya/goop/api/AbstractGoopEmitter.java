@@ -14,9 +14,11 @@ import org.joml.Vector4f;
 public abstract class AbstractGoopEmitter<T extends Entity> implements IGoopEmitter
 {
 	protected Identifier particleEffectOverride;
-	protected boolean mature = false;
+	protected boolean mature = false, dev = false;
 	protected WaterHandling waterHandling = WaterHandling.REPLACE_WITH_CLOUD_PARTICLE;
 	protected ExtraGoopData extraGoopData = new ExtraGoopData();
+	//TODO: Add "Drips" Attribute
+	//TODO: Add "Deforms" Attribute
 	
 	/**
 	 * Replace the Goop Puddle Particle effect with a different one.<br>
@@ -43,6 +45,15 @@ public abstract class AbstractGoopEmitter<T extends Entity> implements IGoopEmit
 	}
 	
 	/**
+	 * Marks this emitter as Dev Content. It will only emit particles if the "Show Dev Particles" Client Setting is turned on.
+	 */
+	public AbstractGoopEmitter<T> markDev()
+	{
+		dev = true;
+		return this;
+	}
+	
+	/**
 	 * Define how this emitter's particles should react on contact with water.
 	 * The Default is WaterHandling.REPLACE_WITH_CLOUD_PARTICLE
 	 */
@@ -55,7 +66,9 @@ public abstract class AbstractGoopEmitter<T extends Entity> implements IGoopEmit
 	@ApiStatus.Internal
 	protected void emitInternal(T entity, int color, Vector4f velocity, int amount, float scale, WaterHandling waterHandling)
 	{
+		//TODO: fetch whether the target client even has dev emitters enabled; if not, don't send any data.
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+		buf.writeBoolean(dev);
 		buf.writeVector3f(entity.getPos().add(0, entity.getHeight() / 2, 0).subtract(entity.getVelocity().multiply(0.2f)).toVector3f());
 		buf.writeInt(color);
 		buf.writeVector3f(new Vector3f(velocity.x, velocity.y, velocity.z));

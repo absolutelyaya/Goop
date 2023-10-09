@@ -2,7 +2,6 @@ package absolutelyaya.goop.api;
 
 import absolutelyaya.goop.Goop;
 import absolutelyaya.goop.registries.TagRegistry;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.mob.ZombieEntity;
@@ -18,10 +17,6 @@ public class Examples implements GoopInitializer
 	@Override
 	public void registerGoopEmitters()
 	{
-		//Don't register these example emitters outside of development environments
-		if(!FabricLoader.getInstance().isDevelopmentEnvironment())
-			return;
-		
 		//All examples shown should work with any Entity, including ones added by other mods.
 		//Entities can have multiple emitters, even multiple of the same type.
 		
@@ -31,14 +26,14 @@ public class Examples implements GoopInitializer
 				(slime, height) -> new Vector4f(0f, -0f, 0f, 0.1f),
 				(slime, height) -> 1,
 				(slime, height) -> MathHelper.clamp(height / 4f, 0.25f, 1) * slime.getSize()
-		));
+		).markDev());
 		
 		GoopEmitterRegistry.registerEmitter(EntityType.SLIME, new DamageGoopEmitter<SlimeEntity>(
 				(slime, data) -> 0x2caa3b,
 				(slime, data) -> new Vector4f(0f, 0f, 0f, MathHelper.clamp(data.amount() / 8f, 0.25f, 2f)),
 				(slime, data) -> data.source().isIn(TagRegistry.PHYSICAL) ? Math.round(MathHelper.clamp(data.amount() / 2f, 2f, 12f)) : 0,
 				(slime, data) -> MathHelper.clamp(data.amount() / 4f, 0.25f, 1)
-		));
+		).markDev());
 		
 		//This causes Zombies to bleed when Damaged by a Physical Attack.
 		//If the Client has Censor Mature Content on, these particles will render in their Censor Color.
@@ -47,7 +42,7 @@ public class Examples implements GoopInitializer
 				(zombie, data) -> new Vector4f(0f, 0f, 0f, MathHelper.clamp(data.amount() / 8f, 0.25f, 2f)),
 				(zombie, data) -> data.source().isIn(TagRegistry.PHYSICAL) ? Math.round(MathHelper.clamp(data.amount() / 2f, 2f, 12f)) : 0,
 				(zombie, data) -> MathHelper.clamp(data.amount() / 4f, 0.25f, 1)
-		).markMature());
+		).markDev().markMature());
 		
 		//This causes Snow Golems to melt into blue Goop upon Death.
 		//Since the particle is supposed to resemble water, it will simply disappear when making content with actual Water.
@@ -67,6 +62,6 @@ public class Examples implements GoopInitializer
 				},
 				(egg, data) -> 1,
 				(egg, data) -> 0.5f
-		).setParticleEffectOverride(new Identifier(Goop.MOD_ID, "egg_goop"), new ExtraGoopData()));
+		).markDev().setParticleEffectOverride(new Identifier(Goop.MOD_ID, "egg_goop"), new ExtraGoopData()));
 	}
 }

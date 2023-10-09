@@ -10,6 +10,8 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry;
 public class GoopConfig implements ConfigData
 {
 	@ConfigEntry.Gui.Tooltip
+	public boolean showDev = false;
+	@ConfigEntry.Gui.Tooltip
 	public boolean fancyGoop = false;
 	@ConfigEntry.Gui.Tooltip
 	public boolean wrapToEdges = false;
