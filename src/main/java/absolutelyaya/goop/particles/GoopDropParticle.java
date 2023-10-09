@@ -37,14 +37,14 @@ public class GoopDropParticle extends SpriteBillboardParticle
 {
 	protected final SpriteProvider spriteProvider;
 	protected final Vec3d color;
-	protected final boolean mature;
+	protected final boolean mature, drip, deform;
 	final float rotSpeed;
 	final float totalScale;
 	final Identifier effectOverride;
 	final ExtraGoopData extraData;
 	final WaterHandling waterHandling;
 	
-	protected GoopDropParticle(ClientWorld clientWorld, Vec3d pos, Vec3d vel, SpriteProvider spriteProvider, Vec3d color, float scale, boolean mature, WaterHandling waterHandling, Identifier effectOverride, ExtraGoopData extraData)
+	protected GoopDropParticle(ClientWorld clientWorld, Vec3d pos, Vec3d vel, SpriteProvider spriteProvider, Vec3d color, float scale, boolean mature, boolean drip, boolean deform, WaterHandling waterHandling, Identifier effectOverride, ExtraGoopData extraData)
 	{
 		super(clientWorld, pos.x, pos.y, pos.z);
 		GoopConfig config = GoopClient.getConfig();
@@ -55,6 +55,8 @@ public class GoopDropParticle extends SpriteBillboardParticle
 		totalScale = scale;
 		this.spriteProvider = spriteProvider;
 		this.mature = mature;
+		this.drip = drip;
+		this.deform = deform;
 		this.effectOverride = effectOverride;
 		this.extraData = extraData;
 		sprite = spriteProvider.getSprite(random);
@@ -136,15 +138,18 @@ public class GoopDropParticle extends SpriteBillboardParticle
 			try
 			{
 				if(dir.y != 0)
-					world.addParticle(getConstructor(getEffect(effectOverride)).newInstance(color, totalScale * 2.5f, dir, mature, waterHandling, extraData),
+					world.addParticle(getConstructor(getEffect(effectOverride))
+											  .newInstance(color, totalScale * 2.5f, dir, mature, waterHandling, extraData).setDrip(drip).setDeform(deform),
 							x + dir.x * offset.x, pos.getY() + dir.y * offset.y, z + dir.z * offset.z,
 							0, 0, 0);
 				else if(dir.x != 0)
-					world.addParticle(getConstructor(getEffect(effectOverride)).newInstance(color, totalScale * 2.5f, dir, mature, waterHandling, extraData),
+					world.addParticle(getConstructor(getEffect(effectOverride))
+											  .newInstance(color, totalScale * 2.5f, dir, mature, waterHandling, extraData).setDrip(drip).setDeform(deform),
 							pos.getX() + dir.x * offset.x, y + dir.y * offset.y, z + dir.z * offset.z,
 							0, 0, 0);
 				else if(dir.z != 0)
-					world.addParticle(getConstructor(getEffect(effectOverride)).newInstance(color, totalScale * 2.5f, dir, mature, waterHandling, extraData),
+					world.addParticle(getConstructor(getEffect(effectOverride))
+											  .newInstance(color, totalScale * 2.5f, dir, mature, waterHandling, extraData).setDrip(drip).setDeform(deform),
 							x + dir.x * offset.x, y + dir.y * offset.y, pos.getZ() + dir.z * offset.z,
 							0, 0, 0);
 			}
@@ -190,7 +195,7 @@ public class GoopDropParticle extends SpriteBillboardParticle
 		public Particle createParticle(GoopDropParticleEffect parameters, ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ)
 		{
 			return new GoopDropParticle(world, new Vec3d(x, y, z), new Vec3d(velocityX, velocityY, velocityZ),
-					spriteProvider, parameters.getColor(), parameters.getScale(), parameters.isMature(), parameters.getWaterHandling(),
+					spriteProvider, parameters.getColor(), parameters.getScale(), parameters.isMature(), parameters.isDrip(), parameters.isDeform(), parameters.getWaterHandling(),
 					parameters.getEffectOverride(), parameters.getExtraData());
 		}
 	}

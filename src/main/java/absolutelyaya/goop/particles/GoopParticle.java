@@ -25,13 +25,13 @@ public class GoopParticle extends SurfaceAlignedParticle
 	private final float size;
 	private final float normalAlpha;
 	private final int appearTicks;
-	final boolean mature;
+	final boolean mature, drip;
 	final WaterHandling waterHandling;
 	float rain;
 	
-	protected GoopParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider, Vec3d color, float scale, Vec3d dir, boolean mature, WaterHandling waterHandling)
+	protected GoopParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider, Vec3d color, float scale, Vec3d dir, boolean mature, boolean drip, boolean deform, WaterHandling waterHandling)
 	{
-		super(world, x, y, z, spriteProvider, color, scale, dir);
+		super(world, x, y, z, spriteProvider, color, scale, dir, deform);
 		this.maxAge = config.permanent ? Integer.MAX_VALUE : 200 + random.nextInt(100);
 		this.alpha = Math.min(random.nextFloat() + 0.5f, 1);
 		this.color = mature && config.censorMature ? Vec3d.unpackRgb(config.censorColor) : color;
@@ -40,6 +40,7 @@ public class GoopParticle extends SurfaceAlignedParticle
 		this.normalAlpha = alpha;
 		this.appearTicks = random.nextInt(4) + 3;
 		this.mature = mature;
+		this.drip = drip;
 		this.waterHandling = waterHandling;
 		GOOP_QUEUE.add(this);
 		if(GOOP_QUEUE.size() > config.goopCap)
@@ -79,7 +80,7 @@ public class GoopParticle extends SurfaceAlignedParticle
 			}
 		}
 		//Ceiling Drips
-		if(dir.getY() < 0 && random.nextInt(120) == 0)
+		if(drip && dir.getY() < 0 && random.nextInt(120) == 0)
 			world.addParticle(new GoopStringParticleEffect(color, 0.25f, mature),
 					x + random.nextFloat() * scale - scale / 2f, y + (y < 0 ? 1 : 0), z + random.nextFloat() * scale - scale / 2f,
 					0, 0, 0);
@@ -123,7 +124,8 @@ public class GoopParticle extends SurfaceAlignedParticle
 		@Override
 		public Particle createParticle(GoopParticleEffect parameters, ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ)
 		{
-			return new GoopParticle(world, x, y, z, spriteProvider, parameters.getColor(), parameters.getScale(), parameters.getDir(), parameters.isMature(), parameters.getWaterHandling());
+			return new GoopParticle(world, x, y, z, spriteProvider, parameters.getColor(), parameters.getScale(), parameters.getDir(), parameters.isMature(),
+					parameters.isDrip(), parameters.isDeform(), parameters.getWaterHandling());
 		}
 	}
 }

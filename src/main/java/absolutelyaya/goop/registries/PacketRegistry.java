@@ -29,7 +29,7 @@ public class PacketRegistry
 			float randomness = buf.readFloat();
 			int amount = buf.readInt();
 			float size = buf.readFloat();
-			boolean mature = buf.readBoolean();
+			boolean mature = buf.readBoolean(), drip = buf.readBoolean(), deform = buf.readBoolean();
 			WaterHandling waterHandling = buf.readEnumConstant(WaterHandling.class);
 			
 			boolean isOverridden = buf.readBoolean();
@@ -56,10 +56,10 @@ public class PacketRegistry
 				{
 					Vec3d vel = baseVel.addRandom(client.world.random, randomness);
 					if(isOverridden)
-						client.world.addParticle(new GoopDropParticleEffect(Vec3d.unpackRgb(color), size, mature, waterHandling, effectOverride, data),
+						client.world.addParticle(new GoopDropParticleEffect(Vec3d.unpackRgb(color), size, mature, waterHandling, effectOverride, data).setDrip(drip).setDeform(deform),
 								pos.x, pos.y, pos.z, vel.x, vel.y, vel.z);
 					else
-						client.world.addParticle(new GoopDropParticleEffect(Vec3d.unpackRgb(color), size, mature, waterHandling),
+						client.world.addParticle(new GoopDropParticleEffect(Vec3d.unpackRgb(color), size, mature, waterHandling).setDrip(drip).setDeform(deform),
 								pos.x, pos.y, pos.z, vel.x, vel.y, vel.z);
 				}
 			});

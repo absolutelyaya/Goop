@@ -34,10 +34,10 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 	
 	protected float deformation;
 	float targetSize;
-	boolean isFancy;
+	boolean isFancy, deforms;
 	
 	protected SurfaceAlignedParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider,
-									 Vec3d color, float scale, Vec3d dir)
+									 Vec3d color, float scale, Vec3d dir, boolean deforms)
 	{
 		super(world, x, y, z);
 		this.targetSize = scale;
@@ -49,6 +49,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 		setColor((float)color.getX(), (float)color.getY(), (float)color.getZ());
 		
 		isFancy = config.fancyGoop;
+		this.deforms = deforms;
 		
 		this.dir = new Vec3d((float)Math.round(dir.x), (float)Math.round(dir.y), (float)Math.round(dir.z));
 		boolean b = dir.x != 0;
@@ -121,7 +122,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 			v = v.rotateY((float)(dir.getY() * angle));
 			v = v.rotateZ((float)(dir.getZ() * angle));
 			//deformation
-			if(!(this.dir.getY() > 0) && isFancy)
+			if(deforms && !(this.dir.getY() > 0) && isFancy)
 				v = v.subtract(new Vec3d(0, deformation * maxDeform.get(atomicInt.get()), 0));
 			v = v.multiply(scale);
 			verts.set(i, v.add(f, g, h));
@@ -222,7 +223,8 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 		if(world.getBlockState(new BlockPos((int)(x - dir.getX() + (x < 0 ? -1 : 0)), (int)(y - dir.getY()), (int)(z - dir.getZ() + (z < 0 ? -1 : 0)))).isAir() ||
 				   !world.getBlockState(new BlockPos((int)x + (x < 0 ? -1 : 0), (int)y, (int)z + (z < 0 ? -1 : 0))).isAir())
 			markDead();
-		deformation = (float)age / maxAge;
+		if(deforms)
+			deformation = (float)age / maxAge;
 	}
 	
 	private Vec3d moveToBlockEdge(Vec3d vert)

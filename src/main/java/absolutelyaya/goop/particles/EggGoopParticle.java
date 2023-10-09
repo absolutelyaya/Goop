@@ -10,9 +10,9 @@ import org.jetbrains.annotations.Nullable;
 
 public class EggGoopParticle extends GoopParticle
 {
-	protected EggGoopParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider, Vec3d color, float scale, Vec3d dir, boolean mature, WaterHandling waterHandling)
+	protected EggGoopParticle(ClientWorld world, double x, double y, double z, SpriteProvider spriteProvider, Vec3d color, float scale, Vec3d dir, boolean mature, boolean drip, boolean deform, WaterHandling waterHandling)
 	{
-		super(world, x, y, z, spriteProvider, color, scale, dir, mature, waterHandling);
+		super(world, x, y, z, spriteProvider, color, scale, dir, mature, drip, deform, waterHandling);
 	}
 	
 	public static class Factory implements ParticleFactory<EggGoopParticleEffect>
@@ -29,7 +29,7 @@ public class EggGoopParticle extends GoopParticle
 		public Particle createParticle(EggGoopParticleEffect parameters, ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ)
 		{
 			return new EggGoopParticle(world, x, y, z, spriteProvider, parameters.getColor(), parameters.getScale(), parameters.getDir(),
-					parameters.isMature(), parameters.getWaterHandling());
+					parameters.isMature(), parameters.isDrip(), parameters.isDeform(), parameters.getWaterHandling());
 		}
 	}
 }

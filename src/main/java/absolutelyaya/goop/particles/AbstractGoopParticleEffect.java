@@ -19,6 +19,7 @@ public abstract class AbstractGoopParticleEffect implements ParticleEffect
 	protected final boolean mature;
 	protected final ExtraGoopData extraGoopData;
 	protected final WaterHandling waterHandling;
+	protected boolean drip = true, deform = true;
 	
 	public AbstractGoopParticleEffect(Vec3d color, float scale, boolean mature, ExtraGoopData extraGoopData, WaterHandling waterHandling)
 	{
@@ -83,5 +84,27 @@ public abstract class AbstractGoopParticleEffect implements ParticleEffect
 	public WaterHandling getWaterHandling()
 	{
 		return waterHandling;
+	}
+	
+	public AbstractGoopParticleEffect setDrip(boolean drip)
+	{
+		this.drip = drip;
+		return this;
+	}
+	
+	public boolean isDrip()
+	{
+		return drip;
+	}
+	
+	public AbstractGoopParticleEffect setDeform(boolean deform)
+	{
+		this.deform = deform;
+		return this;
+	}
+	
+	public boolean isDeform()
+	{
+		return deform;
 	}
 }

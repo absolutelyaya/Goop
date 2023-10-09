@@ -14,11 +14,9 @@ import org.joml.Vector4f;
 public abstract class AbstractGoopEmitter<T extends Entity> implements IGoopEmitter
 {
 	protected Identifier particleEffectOverride;
-	protected boolean mature = false, dev = false;
+	protected boolean mature = false, dev = false, drip = true, deform = true;
 	protected WaterHandling waterHandling = WaterHandling.REPLACE_WITH_CLOUD_PARTICLE;
 	protected ExtraGoopData extraGoopData = new ExtraGoopData();
-	//TODO: Add "Drips" Attribute
-	//TODO: Add "Deforms" Attribute
 	
 	/**
 	 * Replace the Goop Puddle Particle effect with a different one.<br>
@@ -54,6 +52,24 @@ public abstract class AbstractGoopEmitter<T extends Entity> implements IGoopEmit
 	}
 	
 	/**
+	 * Disables dripping for ceiling goop caused by this emitter.
+	 */
+	public AbstractGoopEmitter<T> noDrip()
+	{
+		drip = false;
+		return this;
+	}
+	
+	/**
+	 * Disables deformation for ceiling & wall goop caused by this emitter.
+	 */
+	public AbstractGoopEmitter<T> noDeform()
+	{
+		deform = false;
+		return this;
+	}
+	
+	/**
 	 * Define how this emitter's particles should react on contact with water.
 	 * The Default is WaterHandling.REPLACE_WITH_CLOUD_PARTICLE
 	 */
@@ -76,6 +92,8 @@ public abstract class AbstractGoopEmitter<T extends Entity> implements IGoopEmit
 		buf.writeInt(Math.max(amount, 0));
 		buf.writeFloat(Math.max(scale, 0));
 		buf.writeBoolean(mature);
+		buf.writeBoolean(drip);
+		buf.writeBoolean(deform);
 		buf.writeEnumConstant(waterHandling);
 		boolean b = particleEffectOverride != null;
 		buf.writeBoolean(b);

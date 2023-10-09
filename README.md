@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    include modImplementation('com.github.absolutelyaya:goop:fabric-1.20.1-v0.1')
+    modImplementation(include 'com.github.absolutelyaya:goop:fabric-1.20.1-v0.2')
 }
 ```
 And that's pretty much it. You can now use the Goop Particles as you want; You can spawn them like any other particle; or we do something a bit cleaner.
@@ -90,7 +90,7 @@ GoopEmitterRegistry.registerProjectileEmitter(EntityType.EGG, new ProjectileHitG
 		},
 		(egg, data) -> 1,
 		(egg, data) -> 0.5f
-).setParticleEffectOverride(new Identifier(Goop.MOD_ID, "egg_goop"), new ExtraGoopData()));
+).noDrip().setParticleEffectOverride(new Identifier(Goop.MOD_ID, "egg_goop"), new ExtraGoopData()));
 ```
 Since ProjectileEntities aren't LivingEntities, Projectile Emitters use a different register method (``GoopEmitterRegistry#registerProjectileEmitter``).<br>
 "Effect Overrides" will be explained a bit further down.
@@ -101,7 +101,12 @@ This feature is intended to give Players the choice to disable VFX they might fi
 To flag an Emitter as "Mature" Content, use ``.markMature()`` right after instantiating the emitter.<br>
 Already emitted particles won't be censored/uncensored retroactively if a client changes their settings. Rejoining the world will remove all existing Goop instantly though.
 ### "Dev" Content flagging
-Dev Emitters (like all Example emitters for instance) will only emit Particles for players that have the "Show Dev Particles" Client Setting enabled.
+Dev Emitters (like all Example emitters for instance) will only emit Particles for players that have the "Show Dev Particles" Client Setting enabled.<br>
+To flag an Emitter as "Dev Content" Content, use ``.markDev()`` right after instantiating the emitter.
+### Disable Dripping
+To make an emitters goop not drip when it covers a ceiling, use ``.noDrip()`` right after instantiating the emitter.
+### Disable Warping/Deformation
+To make an emitters goop not deform when it covers a wall or ceiling, use ``.noDeform()`` right after instantiating the emitter.
 ### Water Handling
 Currently, there are three options how to handle contact with water:
 1. REMOVE_PARTICLE<br>The Default; Removes Goop the moment they make contact with Water.
