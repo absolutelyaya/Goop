@@ -30,6 +30,8 @@ public class PacketRegistry
 			int amount = buf.readInt();
 			float size = buf.readFloat();
 			boolean mature = buf.readBoolean(), drip = buf.readBoolean(), deform = buf.readBoolean();
+			if(mature && GoopClient.getConfig().disableMature)
+				return;
 			WaterHandling waterHandling = buf.readEnumConstant(WaterHandling.class);
 			
 			boolean isOverridden = buf.readBoolean();

@@ -16,6 +16,9 @@
   "text.autoconfig.goop.option.censorMature": "Censor Mature Content",
   "text.autoconfig.goop.option.censorMature.@Tooltip": "Replaces the colors of Goop VFX marked as mature with the censor Color.",
 
+  "text.autoconfig.goop.option.disableMature": "Completely Hide Mature Content",
+  "text.autoconfig.goop.option.disableMature.@Tooltip": "Disables all emitters marked as mature.",
+
   "text.autoconfig.goop.option.censorColor": "Censor Color",
 
   "text.autoconfig.goop.option.permanent": "Permanent",
