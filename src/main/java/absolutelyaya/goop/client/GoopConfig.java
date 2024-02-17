@@ -17,6 +17,8 @@ public class GoopConfig implements ConfigData
 	public boolean wrapToEdges = false;
 	@ConfigEntry.Gui.Tooltip
 	public boolean censorMature = false;
+	@ConfigEntry.Gui.Tooltip
+	public CensorMode censorMode = CensorMode.RECOLOR;
 	@ConfigEntry.ColorPicker
 	public int censorColor = 0xff0fc3;
 	@ConfigEntry.Gui.Tooltip

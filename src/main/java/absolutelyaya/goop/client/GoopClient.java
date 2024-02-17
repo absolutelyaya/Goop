@@ -34,4 +34,14 @@ public class GoopClient implements ClientModInitializer
 		
 		PacketRegistry.registerClient();
 	}
+	
+	public static boolean recolorMature()
+	{
+		return config.get().censorMature && config.get().censorMode.equals(CensorMode.RECOLOR);
+	}
+	
+	public static boolean hideMature()
+	{
+		return config.get().censorMature && config.get().censorMode.equals(CensorMode.HIDE);
+	}
 }

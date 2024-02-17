@@ -32,6 +32,9 @@ public class PacketRegistry
 			boolean mature = buf.readBoolean(), drip = buf.readBoolean(), deform = buf.readBoolean();
 			WaterHandling waterHandling = buf.readEnumConstant(WaterHandling.class);
 			
+			if(mature && GoopClient.hideMature())
+				return;
+			
 			boolean isOverridden = buf.readBoolean();
 			Identifier effectOverride = isOverridden ? buf.readIdentifier() : null;
 			ExtraGoopData data;
