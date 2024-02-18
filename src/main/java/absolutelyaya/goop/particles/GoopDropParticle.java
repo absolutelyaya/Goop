@@ -12,6 +12,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleType;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
@@ -19,10 +20,7 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
@@ -127,12 +125,14 @@ public class GoopDropParticle extends SpriteBillboardParticle
 	
 	void nextParticle(BlockPos pos, Vec3d dir)
 	{
-		if(!world.getBlockState(pos.subtract(new Vec3i(0, dir.y < 0 && y < 0 ? 2 : 0, 0))).isAir())
+		VoxelShape shape = world.getBlockState(pos.subtract(new Vec3i(0, dir.y < 0 && y < 0 ? 2 : 0, 0))).getCollisionShape(world, pos);
+		if(!shape.isEmpty())
 		{
 			dir = dir.normalize();
 			
-			Vec3d offset = new Vec3d(1, 1, 1).multiply(Math.max(random.nextFloat() * 0.02f, 0.01f));
-			offset = offset.add(dir.x < 0 ? 0 : 1, dir.y < 0 ? (y < 0 ? 4 : 0) : 1, dir.z < 0 ? 0 : 1)
+			float height = (float)shape.getMax(Direction.Axis.Y);
+			Vec3d offset = new Vec3d(0.01, 0.01, 0.01);
+			offset = offset.add(dir.x < 0 ? 0 : 1, dir.y < 0 ? (y < 0 ? 4 : 0) : height, dir.z < 0 ? 0 : 1)
 							 .subtract(0, y < 0 ? 1 : 0, 0);
 			
 			try
@@ -140,17 +140,17 @@ public class GoopDropParticle extends SpriteBillboardParticle
 				if(dir.y != 0)
 					world.addParticle(getConstructor(getEffect(effectOverride))
 											  .newInstance(color, totalScale * 2.5f, dir, mature, waterHandling, extraData).setDrip(drip).setDeform(deform),
-							x + dir.x * offset.x, pos.getY() + dir.y * offset.y, z + dir.z * offset.z,
+							x, pos.getY() + dir.y * offset.y, z,
 							0, 0, 0);
 				else if(dir.x != 0)
 					world.addParticle(getConstructor(getEffect(effectOverride))
 											  .newInstance(color, totalScale * 2.5f, dir, mature, waterHandling, extraData).setDrip(drip).setDeform(deform),
-							pos.getX() + dir.x * offset.x, y + dir.y * offset.y, z + dir.z * offset.z,
+							pos.getX() + dir.x * offset.x, y, z,
 							0, 0, 0);
 				else if(dir.z != 0)
 					world.addParticle(getConstructor(getEffect(effectOverride))
 											  .newInstance(color, totalScale * 2.5f, dir, mature, waterHandling, extraData).setDrip(drip).setDeform(deform),
-							x + dir.x * offset.x, y + dir.y * offset.y, pos.getZ() + dir.z * offset.z,
+							x, y, pos.getZ() + dir.z * offset.z,
 							0, 0, 0);
 			}
 			catch (InvocationTargetException | InstantiationException | IllegalAccessException e)
@@ -166,15 +166,29 @@ public class GoopDropParticle extends SpriteBillboardParticle
 		if (this.collidesWithWorld && (dx != 0.0 || dy != 0.0 || dz != 0.0) && dx * dx + dy * dy + dz * dz < MathHelper.square(100.0))
 		{
 			Iterator<VoxelShape> it = world.getBlockCollisions(null, getBoundingBox().stretch(new Vec3d(dx, dy, dz))).iterator();
-			if(it.hasNext())
+			VoxelShape closest = null;
+			float closestDist = Float.MAX_VALUE;
+			Vec3d pos = new Vec3d(x, y, z);
+			while(it.hasNext())
 			{
 				VoxelShape shape = it.next();
-				Vec3d point = shape.getBoundingBox().getCenter();
+				Optional<Vec3d> closestPoint = shape.getClosestPointTo(pos);
+				if(closestPoint.isEmpty())
+					continue;
+				float dist = (float)pos.distanceTo(closestPoint.get());
+				if(dist < closestDist)
+				{
+					closest = shape;
+					closestDist = dist;
+				}
+			}
+			if(closest != null)
+			{
+				Vec3d point = closest.getBoundingBox().getCenter();
 				Vec3d vec3d = Entity.adjustMovementForCollisions(null, new Vec3d(dx, dy, dz), this.getBoundingBox(), this.world, List.of());
 				Vec3d diff = vec3d.subtract(new Vec3d(dx, dy, dz)).normalize();
 				
-				nextParticle(new BlockPos((int)point.x + (x < 0 ? -1 : 0),
-						((int)point.y + (y < 0 ? (diff.y < 0 ? 1 : -1) : 0)), (int)point.z + (z < 0 ? -1 : 0)), diff);
+				nextParticle(BlockPos.ofFloored(point.x, (point.y + (y < 0 ? (diff.y < 0 ? 1 : -1) : 0)), point.z), diff);
 				markDead();
 			}
 		}

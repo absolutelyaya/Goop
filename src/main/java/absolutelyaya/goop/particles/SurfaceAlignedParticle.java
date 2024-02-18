@@ -15,6 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -148,10 +149,9 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 					faceCenter = faceCenter.add(faceVerts[2]);
 					faceCenter = faceCenter.add(faceVerts[3]);
 					faceCenter = faceCenter.multiply(0.25f);
-					//check if block below center of face is air or not solid
+					//check if position of this face is attached to a valid surface
 					Vec3d v = camPos.add(faceCenter);
-					BlockPos pos = new BlockPos((int)v.x, (int)v.y, (int)v.z);
-					render = world.getBlockState(pos.down()).isFullCube(world, pos.down()) && !world.getBlockState(pos).isFullCube(world, pos);
+					render = isValidPos(v);
 					if(!render)
 						faceShouldRender.set(vi, false); //so faces don't reappear after being removed
 					
@@ -169,8 +169,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 						{
 							Vec3d mv = faceVerts[i];
 							mv = mv.add(camPos);
-							BlockPos vpos = new BlockPos((int)mv.x, (int)mv.y, (int)mv.z);
-							if(world.isAir(vpos.down()) || world.getBlockState(pos).isFullCube(world, pos))
+							if(!isValidPos(mv))
 								mv = moveToBlockEdge(mv);
 							faceVerts[i] = mv.subtract(camPos);
 						}
@@ -216,12 +215,23 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 		}
 	}
 	
+	boolean isValidPos(Vec3d pos)
+	{
+		BlockPos blockPos = BlockPos.ofFloored(pos);
+		VoxelShape shape = world.getBlockState(blockPos).getOutlineShape(world, blockPos);
+		if(!shape.isEmpty() && shape.getBoundingBox().offset(blockPos).contains(pos))
+			return false;
+		Vec3d attachedPos = new Vec3d(pos.x - dir.getX() * 0.065f, pos.y - dir.getY() * 0.065f, pos.z - dir.getZ() * 0.065f);
+		BlockPos attachedBlockPos = BlockPos.ofFloored(attachedPos);
+		VoxelShape attachedShape = world.getBlockState(attachedBlockPos).getCollisionShape(world, attachedBlockPos);
+		return !attachedShape.isEmpty() && attachedShape.getBoundingBox().offset(attachedBlockPos).contains(attachedPos);
+	}
+	
 	@Override
 	public void tick()
 	{
 		super.tick();
-		if(world.getBlockState(new BlockPos((int)(x - dir.getX() + (x < 0 ? -1 : 0)), (int)(y - dir.getY()), (int)(z - dir.getZ() + (z < 0 ? -1 : 0)))).isAir() ||
-				   !world.getBlockState(new BlockPos((int)x + (x < 0 ? -1 : 0), (int)y, (int)z + (z < 0 ? -1 : 0))).isAir())
+		if(!isValidPos(new Vec3d(x, y, z)))
 			markDead();
 		if(deforms)
 			deformation = (float)age / maxAge;
