@@ -12,7 +12,6 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleType;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
@@ -46,7 +45,7 @@ public class GoopDropParticle extends SpriteBillboardParticle
 	{
 		super(clientWorld, pos.x, pos.y, pos.z);
 		GoopConfig config = GoopClient.getConfig();
-		color = mature && config.censorMature ? Vec3d.unpackRgb(config.censorColor) : color;
+		color = mature && GoopClient.recolorMature() ? Vec3d.unpackRgb(config.censorColor) : color;
 		setColor((float)color.getX(), (float)color.getY(), (float)color.getZ());
 		this.color = color;
 		this.scale = scale - (scale > 1 ? 1.25f * (scale / 2) : 0f);

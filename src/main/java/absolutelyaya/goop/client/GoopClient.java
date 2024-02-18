@@ -4,6 +4,7 @@ import absolutelyaya.goop.particles.EggGoopParticle;
 import absolutelyaya.goop.particles.GoopDropParticle;
 import absolutelyaya.goop.particles.GoopParticle;
 import absolutelyaya.goop.particles.GoopStringParticle;
+import absolutelyaya.goop.registries.KeybindRegistry;
 import absolutelyaya.goop.registries.PacketRegistry;
 import absolutelyaya.goop.registries.ParticleRegistry;
 import me.shedaniel.autoconfig.AutoConfig;
@@ -33,6 +34,7 @@ public class GoopClient implements ClientModInitializer
 		particleRegistry.register(ParticleRegistry.EGG_GOOP, EggGoopParticle.Factory::new);
 		
 		PacketRegistry.registerClient();
+		KeybindRegistry.register();
 	}
 	
 	public static boolean recolorMature()

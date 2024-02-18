@@ -8,7 +8,9 @@
     "Absolutelyaya"
   ],
   "contact": {
-    "repo": "https://github.com/absolutelyaya/Goop"
+    "issues": "https://github.com/absolutelyaya/Goop/issues",
+    "repo": "https://github.com/absolutelyaya/Goop",
+    "homepage": "https://absolutelyaya.neocities.org/"
   },
   "license": "MIT",
   "icon": "assets/goop/icon.png",

@@ -2,6 +2,9 @@
   "modmenu.descriptionTranslation.goop": "Adds Splatter Particle Effects for Blood, Slime or other cool VFX",
   "yaya.support.kofi": "Support yayas hijinx",
 
+  "category.goop": "Goop Technology",
+  "key.goop.clear": "Clear Goop",
+
   "text.autoconfig.goop.title": "Goop Config",
 
   "text.autoconfig.goop.category.default": "Goop",

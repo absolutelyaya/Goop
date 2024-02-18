@@ -15,6 +15,7 @@ import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Queue;
 
 public class GoopParticle extends SurfaceAlignedParticle
@@ -34,7 +35,7 @@ public class GoopParticle extends SurfaceAlignedParticle
 		super(world, x, y, z, spriteProvider, color, scale, dir, deform);
 		this.maxAge = config.permanent ? Integer.MAX_VALUE : 200 + random.nextInt(100);
 		this.alpha = Math.min(random.nextFloat() + 0.5f, 1);
-		this.color = mature && config.censorMature ? Vec3d.unpackRgb(config.censorColor) : color;
+		this.color = mature && GoopClient.recolorMature() ? Vec3d.unpackRgb(config.censorColor) : color;
 		this.scale = 0;
 		this.size = scale;
 		this.normalAlpha = alpha;
@@ -109,6 +110,11 @@ public class GoopParticle extends SurfaceAlignedParticle
 	{
 		super.markDead();
 		GOOP_QUEUE.remove(this);
+	}
+	
+	public static void removeAll()
+	{
+		new ArrayList<>(GOOP_QUEUE).forEach(GoopParticle::markDead);
 	}
 	
 	public static class Factory implements ParticleFactory<GoopParticleEffect>

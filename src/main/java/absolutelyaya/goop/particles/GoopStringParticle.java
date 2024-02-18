@@ -19,7 +19,7 @@ public class GoopStringParticle extends SpriteAAParticle
 		gravityStrength = random.nextFloat() * 0.25f + 0.1f;
 		maxAge = random.nextInt(15) + 20;
 		GoopConfig config = GoopClient.getConfig();
-		color = mature && config.censorMature ? Vec3d.unpackRgb(config.censorColor) : color;
+		color = mature && GoopClient.recolorMature() ? Vec3d.unpackRgb(config.censorColor) : color;
 		setColor((float)color.getX(), (float)color.getY(), (float)color.getZ());
 		this.scale = this.scale.multiply(scale);
 		collidesWithWorld = true;
