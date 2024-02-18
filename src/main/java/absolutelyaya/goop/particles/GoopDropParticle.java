@@ -125,15 +125,14 @@ public class GoopDropParticle extends SpriteBillboardParticle
 	
 	void nextParticle(BlockPos pos, Vec3d dir)
 	{
-		VoxelShape shape = world.getBlockState(pos.subtract(new Vec3i(0, dir.y < 0 && y < 0 ? 2 : 0, 0))).getCollisionShape(world, pos);
+		VoxelShape shape = world.getBlockState(pos.subtract(new Vec3i(0, 0, 0))).getCollisionShape(world, pos);
 		if(!shape.isEmpty())
 		{
 			dir = dir.normalize();
 			
 			float height = (float)shape.getMax(Direction.Axis.Y);
 			Vec3d offset = new Vec3d(0.01, 0.01, 0.01);
-			offset = offset.add(dir.x < 0 ? 0 : 1, dir.y < 0 ? (y < 0 ? 4 : 0) : height, dir.z < 0 ? 0 : 1)
-							 .subtract(0, y < 0 ? 1 : 0, 0);
+			offset = offset.add(dir.x < 0 ? 0 : 1, dir.y < 0 ? 0 : height, dir.z < 0 ? 0 : 1);
 			
 			try
 			{
@@ -188,7 +187,7 @@ public class GoopDropParticle extends SpriteBillboardParticle
 				Vec3d vec3d = Entity.adjustMovementForCollisions(null, new Vec3d(dx, dy, dz), this.getBoundingBox(), this.world, List.of());
 				Vec3d diff = vec3d.subtract(new Vec3d(dx, dy, dz)).normalize();
 				
-				nextParticle(BlockPos.ofFloored(point.x, (point.y + (y < 0 ? (diff.y < 0 ? 1 : -1) : 0)), point.z), diff);
+				nextParticle(BlockPos.ofFloored(point.x, point.y, point.z), diff);
 				markDead();
 			}
 		}

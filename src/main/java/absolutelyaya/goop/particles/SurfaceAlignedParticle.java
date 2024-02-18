@@ -179,17 +179,16 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 				if(render)
 				{
 					int brightness = getBrightness(tickDelta);
-					boolean up = this.y < 0;
 					//face
-					vertexConsumer.vertex(faceVerts[0].getX(), faceVerts[0].getY() + (up ? 1.01 : 0), faceVerts[0].getZ()).texture(uvs.get(vi).x, uvs.get(vi).y).color(this.red, this.green, this.blue, this.alpha).light(brightness).next();
-					vertexConsumer.vertex(faceVerts[1].getX(), faceVerts[1].getY() + (up ? 1.01 : 0), faceVerts[1].getZ()).texture(uvs.get((int)(vi + targetSize + 1)).x, uvs.get((int)(vi + targetSize + 1)).y).color(this.red, this.green, this.blue, this.alpha).light(brightness).next();
-					vertexConsumer.vertex(faceVerts[2].getX(), faceVerts[2].getY() + (up ? 1.01 : 0), faceVerts[2].getZ()).texture(uvs.get((int)(vi + targetSize + 2)).x, uvs.get((int)(vi + targetSize + 2)).y).color(this.red, this.green, this.blue, this.alpha).light(brightness).next();
-					vertexConsumer.vertex(faceVerts[3].getX(), faceVerts[3].getY() + (up ? 1.01 : 0), faceVerts[3].getZ()).texture(uvs.get(vi + 1).x, uvs.get(vi + 1).y).color(this.red, this.green, this.blue, this.alpha).light(brightness).next();
+					vertexConsumer.vertex(faceVerts[0].getX(), faceVerts[0].getY(), faceVerts[0].getZ()).texture(uvs.get(vi).x, uvs.get(vi).y).color(this.red, this.green, this.blue, this.alpha).light(brightness).next();
+					vertexConsumer.vertex(faceVerts[1].getX(), faceVerts[1].getY(), faceVerts[1].getZ()).texture(uvs.get((int)(vi + targetSize + 1)).x, uvs.get((int)(vi + targetSize + 1)).y).color(this.red, this.green, this.blue, this.alpha).light(brightness).next();
+					vertexConsumer.vertex(faceVerts[2].getX(), faceVerts[2].getY(), faceVerts[2].getZ()).texture(uvs.get((int)(vi + targetSize + 2)).x, uvs.get((int)(vi + targetSize + 2)).y).color(this.red, this.green, this.blue, this.alpha).light(brightness).next();
+					vertexConsumer.vertex(faceVerts[3].getX(), faceVerts[3].getY(), faceVerts[3].getZ()).texture(uvs.get(vi + 1).x, uvs.get(vi + 1).y).color(this.red, this.green, this.blue, this.alpha).light(brightness).next();
 					//backface
-					vertexConsumer.vertex(faceVerts[3].getX(), faceVerts[3].getY() + (up ? 1.01 : 0), faceVerts[3].getZ()).texture(uvs.get(vi + 1).x, uvs.get(vi + 1).y).color(this.red, this.green, this.blue, this.alpha).light(brightness).next();
-					vertexConsumer.vertex(faceVerts[2].getX(), faceVerts[2].getY() + (up ? 1.01 : 0), faceVerts[2].getZ()).texture(uvs.get((int)(vi + targetSize + 2)).x, uvs.get((int)(vi + targetSize + 2)).y).color(this.red, this.green, this.blue, this.alpha).light(brightness).next();
-					vertexConsumer.vertex(faceVerts[1].getX(), faceVerts[1].getY() + (up ? 1.01 : 0), faceVerts[1].getZ()).texture(uvs.get((int)(vi + targetSize + 1)).x, uvs.get((int)(vi + targetSize + 1)).y).color(this.red, this.green, this.blue, this.alpha).light(brightness).next();
-					vertexConsumer.vertex(faceVerts[0].getX(), faceVerts[0].getY() + (up ? 1.01 : 0), faceVerts[0].getZ()).texture(uvs.get(vi).x, uvs.get(vi).y).color(this.red, this.green, this.blue, this.alpha).light(brightness).next();
+					vertexConsumer.vertex(faceVerts[3].getX(), faceVerts[3].getY(), faceVerts[3].getZ()).texture(uvs.get(vi + 1).x, uvs.get(vi + 1).y).color(this.red, this.green, this.blue, this.alpha).light(brightness).next();
+					vertexConsumer.vertex(faceVerts[2].getX(), faceVerts[2].getY(), faceVerts[2].getZ()).texture(uvs.get((int)(vi + targetSize + 2)).x, uvs.get((int)(vi + targetSize + 2)).y).color(this.red, this.green, this.blue, this.alpha).light(brightness).next();
+					vertexConsumer.vertex(faceVerts[1].getX(), faceVerts[1].getY(), faceVerts[1].getZ()).texture(uvs.get((int)(vi + targetSize + 1)).x, uvs.get((int)(vi + targetSize + 1)).y).color(this.red, this.green, this.blue, this.alpha).light(brightness).next();
+					vertexConsumer.vertex(faceVerts[0].getX(), faceVerts[0].getY(), faceVerts[0].getZ()).texture(uvs.get(vi).x, uvs.get(vi).y).color(this.red, this.green, this.blue, this.alpha).light(brightness).next();
 				}
 				verts.set(vi, faceVerts[0]);
 				verts.set((int)(vi + targetSize + 1), faceVerts[1]);
@@ -218,7 +217,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 	boolean isValidPos(Vec3d pos)
 	{
 		BlockPos blockPos = BlockPos.ofFloored(pos);
-		VoxelShape shape = world.getBlockState(blockPos).getOutlineShape(world, blockPos);
+		VoxelShape shape = world.getBlockState(blockPos).getCollisionShape(world, blockPos);
 		if(!shape.isEmpty() && shape.getBoundingBox().offset(blockPos).contains(pos))
 			return false;
 		Vec3d attachedPos = new Vec3d(pos.x - dir.getX() * 0.065f, pos.y - dir.getY() * 0.065f, pos.z - dir.getZ() * 0.065f);
@@ -247,7 +246,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 	protected int getBrightness(float tint)
 	{
 		BlockPos blockPos = BlockPos.ofFloored(this.x, this.y, this.z);
-		return WorldRenderer.getLightmapCoordinates(this.world, blockPos.add(0, (this.y < 0 && dir.y > 0) ? 1 : 0, 0));
+		return WorldRenderer.getLightmapCoordinates(this.world, blockPos);
 	}
 	
 	static {

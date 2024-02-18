@@ -82,7 +82,7 @@ public class GoopParticle extends SurfaceAlignedParticle
 		//Ceiling Drips
 		if(drip && dir.getY() < 0 && random.nextInt(120) == 0)
 			world.addParticle(new GoopStringParticleEffect(color, 0.25f, mature),
-					x + random.nextFloat() * scale - scale / 2f, y + (y < 0 ? 1 : 0), z + random.nextFloat() * scale - scale / 2f,
+					x + random.nextFloat() * scale - scale / 2f, y, z + random.nextFloat() * scale - scale / 2f,
 					0, 0, 0);
 		//Fluid handling
 		if(world.getFluidState(new BlockPos((int)x, (int)y, (int)z)).isIn(FluidTags.LAVA))
