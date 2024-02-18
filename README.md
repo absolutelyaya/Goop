@@ -1,6 +1,15 @@
 # Goop
 Originally released as part of [ULTRACRAFT](https://github.com/absolutelyaya/ultracraft), Goop is now a standalone Library. It can be used to easily implement Slime and Splatter Visual Effects. There have been some major improvements since its debut in ULTRACRAFT as well.
 
+## Planned Future Features
+I don't know when I'll work on these, but they're things I definitely want to do eventually:
+- [ ] Datapack support
+  - Add effects using Datapacks instead of having to make extension mods
+- [ ] Client Side only Support
+  - make effects work without servers needing the mod as well
+  - add way to add effects client side; best case using in-game customization gui
+- [ ] Forge Port
+  - It'd be cool to figure out how to support *all* mod loaders regardless
 
 # That's cool but how do I use it
 ## Importing the dependency
