@@ -13,6 +13,9 @@
   "text.autoconfig.goop.option.wrapToEdges": "Wrap to Edges",
   "text.autoconfig.goop.option.wrapToEdges.@Tooltip": "Whether Goop should wrap to block edges.",
 
+  "text.autoconfig.goop.option.randomRot": "Random Rotation",
+  "text.autoconfig.goop.option.randomRot.@Tooltip": "Whether Goop should be rotated randomly.",
+
   "text.autoconfig.goop.option.censorMature": "Censor Mature Content",
   "text.autoconfig.goop.option.censorMature.@Tooltip": "Replaces the colors of Goop VFX marked as mature with the censor Color.",
 

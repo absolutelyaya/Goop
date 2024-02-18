@@ -46,7 +46,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 		this.spriteProvider = spriteProvider;
 		sprite = spriteProvider.getSprite(random);
 		gravityStrength = 0;
-		angle = random.nextFloat() * 360;
+		angle = config.randomRot ? random.nextFloat() * 360 : 0;
 		setColor((float)color.getX(), (float)color.getY(), (float)color.getZ());
 		
 		isFancy = config.fancyGoop;
