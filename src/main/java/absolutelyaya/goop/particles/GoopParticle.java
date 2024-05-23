@@ -2,13 +2,14 @@ package absolutelyaya.goop.particles;
 
 import absolutelyaya.goop.api.WaterHandling;
 import absolutelyaya.goop.client.GoopClient;
+import absolutelyaya.goop.util.BackportUtil;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.ParticleTextureSheet;
 import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.DustParticleEffect;
-import net.minecraft.registry.tag.FluidTags;
+import net.minecraft.tag.FluidTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -97,7 +98,7 @@ public class GoopParticle extends SurfaceAlignedParticle
 				case REMOVE_PARTICLE -> markDead();
 				case REPLACE_WITH_CLOUD_PARTICLE ->
 				{
-					world.addParticle(new DustParticleEffect(color.toVector3f(), scale), x, y, z,
+					world.addParticle(new DustParticleEffect(BackportUtil.vec3dTo3f(color), scale), x, y, z,
 							random.nextFloat() * 0.1f, random.nextFloat() * 0.1f, random.nextFloat() * 0.1f);
 					markDead();
 				}

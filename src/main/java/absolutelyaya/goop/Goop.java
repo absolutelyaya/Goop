@@ -2,7 +2,6 @@ package absolutelyaya.goop;
 
 import absolutelyaya.goop.api.GoopEmitterRegistry;
 import absolutelyaya.goop.api.GoopInitializer;
-import absolutelyaya.goop.registries.TagRegistry;
 import com.mojang.logging.LogUtils;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
@@ -16,7 +15,6 @@ public class Goop implements ModInitializer
 	@Override
 	public void onInitialize()
 	{
-		TagRegistry.register();
 		for (GoopInitializer initializer : FabricLoader.getInstance().getEntrypoints("goop", GoopInitializer.class))
 			initializer.registerGoopEmitters();
 		GoopEmitterRegistry.freeze();

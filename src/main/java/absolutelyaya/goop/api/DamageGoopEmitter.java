@@ -1,8 +1,8 @@
 package absolutelyaya.goop.api;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.math.Vector4f;
 import org.jetbrains.annotations.ApiStatus;
-import org.joml.Vector4f;
 
 import java.util.function.BiFunction;
 

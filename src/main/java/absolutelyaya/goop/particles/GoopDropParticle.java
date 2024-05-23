@@ -7,19 +7,19 @@ import absolutelyaya.goop.api.WaterHandling;
 import absolutelyaya.goop.client.GoopClient;
 import absolutelyaya.goop.client.GoopConfig;
 import absolutelyaya.goop.registries.ParticleRegistry;
+import absolutelyaya.goop.util.BackportUtil;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleType;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.FluidTags;
+import net.minecraft.tag.FluidTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.math.*;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.util.shape.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
@@ -92,7 +92,7 @@ public class GoopDropParticle extends SpriteBillboardParticle
 				case REMOVE_PARTICLE -> markDead();
 				case REPLACE_WITH_CLOUD_PARTICLE ->
 				{
-					world.addParticle(new DustParticleEffect(color.toVector3f(), totalScale * 2.5f), x, y, z,
+					world.addParticle(new DustParticleEffect(BackportUtil.vec3dTo3f(color), totalScale * 2.5f), x, y, z,
 							random.nextFloat() * 0.1f, random.nextFloat() * 0.1f, random.nextFloat() * 0.1f);
 					markDead();
 				}
@@ -104,8 +104,8 @@ public class GoopDropParticle extends SpriteBillboardParticle
 	{
 		if(override == null)
 			return ParticleRegistry.GOOP;
-		RegistryKey<ParticleType<?>> registryKey = RegistryKey.of(RegistryKeys.PARTICLE_TYPE, override);
-		Optional<RegistryEntry.Reference<ParticleType<?>>> output = Registries.PARTICLE_TYPE.getReadOnlyWrapper().getOptional(registryKey);
+		RegistryKey<ParticleType<?>> registryKey = RegistryKey.of(Registry.PARTICLE_TYPE_KEY, override);
+		Optional<RegistryEntry<ParticleType<?>>> output = Registry.PARTICLE_TYPE.getEntry(registryKey);
 		return (ParticleType<GoopParticleEffect>)output.orElseThrow(() -> new InvalidIdentifierException(String.format("Identifier '%s' is not a Valid Particle Type", override))).value();
 	}
 	
@@ -117,7 +117,7 @@ public class GoopDropParticle extends SpriteBillboardParticle
 		}
 		catch (NoSuchMethodException e)
 		{
-			Goop.LOGGER.error("Required Goop Particle Effect Constructor not found:\n\b" + e.getMessage());
+			Goop.LOGGER.error("Required Goop Particle Effect Constructor not found:\n\b{}", e.getMessage());
 			return null;
 		}
 	}
@@ -186,7 +186,7 @@ public class GoopDropParticle extends SpriteBillboardParticle
 				Vec3d vec3d = Entity.adjustMovementForCollisions(null, new Vec3d(dx, dy, dz), this.getBoundingBox(), this.world, List.of());
 				Vec3d diff = vec3d.subtract(new Vec3d(dx, dy, dz)).normalize();
 				
-				nextParticle(BlockPos.ofFloored(point.x, point.y, point.z), diff);
+				nextParticle(BackportUtil.ofFloored(point.x, point.y, point.z), diff);
 				markDead();
 			}
 		}

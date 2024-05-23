@@ -2,6 +2,7 @@ package absolutelyaya.goop.particles;
 
 import absolutelyaya.goop.client.GoopClient;
 import absolutelyaya.goop.client.GoopConfig;
+import absolutelyaya.goop.util.BackportUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.particle.SpriteBillboardParticle;
 import net.minecraft.client.particle.SpriteProvider;
@@ -11,12 +12,8 @@ import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.util.shape.VoxelShape;
-import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -204,24 +201,24 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 			{
 				Vec3d vertex = verts.get(i);
 				Vec2f uv = uvs.get(i);
-				world.addParticle(new DustParticleEffect(new Vector3f(uv.x, uv.y, 0f), 0.5f),
+				world.addParticle(new DustParticleEffect(new Vec3f(uv.x, uv.y, 0f), 0.5f),
 						camPos.x + vertex.getX(), camPos.y + vertex.getY() + 0.1, camPos.z + vertex.getZ(),
 						0, 0.05, 0);
 			}
 			//goop Center
-			world.addParticle(new DustParticleEffect(new Vector3f(1f, 1f, 1f), 1f), this.x, this.y, this.z,
+			world.addParticle(new DustParticleEffect(new Vec3f(1f, 1f, 1f), 1f), this.x, this.y, this.z,
 					0, 0.25, 0);
 		}
 	}
 	
 	boolean isValidPos(Vec3d pos)
 	{
-		BlockPos blockPos = BlockPos.ofFloored(pos);
+		BlockPos blockPos = BackportUtil.ofFloored(pos);
 		VoxelShape shape = world.getBlockState(blockPos).getCollisionShape(world, blockPos);
 		if(!shape.isEmpty() && shape.getBoundingBox().offset(blockPos).contains(pos))
 			return false;
 		Vec3d attachedPos = new Vec3d(pos.x - dir.getX() * 0.065f, pos.y - dir.getY() * 0.065f, pos.z - dir.getZ() * 0.065f);
-		BlockPos attachedBlockPos = BlockPos.ofFloored(attachedPos);
+		BlockPos attachedBlockPos = BackportUtil.ofFloored(attachedPos);
 		VoxelShape attachedShape = world.getBlockState(attachedBlockPos).getCollisionShape(world, attachedBlockPos);
 		return !attachedShape.isEmpty() && attachedShape.getBoundingBox().offset(attachedBlockPos).contains(attachedPos);
 	}
@@ -245,7 +242,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 	@Override
 	protected int getBrightness(float tint)
 	{
-		BlockPos blockPos = BlockPos.ofFloored(this.x, this.y, this.z);
+		BlockPos blockPos = BackportUtil.ofFloored(this.x, this.y, this.z);
 		return WorldRenderer.getLightmapCoordinates(this.world, blockPos);
 	}
 	

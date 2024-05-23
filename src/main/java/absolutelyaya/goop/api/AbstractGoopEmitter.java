@@ -1,15 +1,16 @@
 package absolutelyaya.goop.api;
 
 import absolutelyaya.goop.registries.PacketRegistry;
+import absolutelyaya.goop.util.BackportUtil;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vector4f;
 import org.jetbrains.annotations.ApiStatus;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
 
 public abstract class AbstractGoopEmitter<T extends Entity> implements IGoopEmitter
 {
@@ -85,10 +86,10 @@ public abstract class AbstractGoopEmitter<T extends Entity> implements IGoopEmit
 		//TODO: fetch whether the target client even has dev emitters enabled; if not, don't send any data.
 		PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 		buf.writeBoolean(dev);
-		buf.writeVector3f(entity.getPos().add(0, entity.getHeight() / 2, 0).subtract(entity.getVelocity().multiply(0.2f)).toVector3f());
+		BackportUtil.writeVec3fToByteBuf(buf, entity.getPos().add(0, entity.getHeight() / 2, 0).subtract(entity.getVelocity().multiply(0.2f)));
 		buf.writeInt(color);
-		buf.writeVector3f(new Vector3f(velocity.x, velocity.y, velocity.z));
-		buf.writeFloat(velocity.w);
+		BackportUtil.writeVec3fToByteBuf(buf, new Vec3d(velocity.getX(), velocity.getY(), velocity.getZ()));
+		buf.writeFloat(velocity.getZ());
 		buf.writeInt(Math.max(amount, 0));
 		buf.writeFloat(Math.max(scale, 0));
 		buf.writeBoolean(mature);

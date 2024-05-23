@@ -6,6 +6,7 @@ import absolutelyaya.goop.api.GoopEmitterRegistry;
 import absolutelyaya.goop.api.WaterHandling;
 import absolutelyaya.goop.client.GoopClient;
 import absolutelyaya.goop.particles.GoopDropParticleEffect;
+import absolutelyaya.goop.util.BackportUtil;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.PacketByteBuf;
@@ -23,9 +24,9 @@ public class PacketRegistry
 		ClientPlayNetworking.registerGlobalReceiver(PacketRegistry.EMIT_GOOP_PACKET_ID, ((client, handler, buf, sender) -> {
 			if(buf.readBoolean() && !GoopClient.getConfig().showDev)
 				return;
-			Vec3d pos = new Vec3d(buf.readVector3f());
+			Vec3d pos = new Vec3d(BackportUtil.readVec3fFromByteBuf(buf));
 			int color = buf.readInt();
-			Vec3d baseVel = new Vec3d(buf.readVector3f());
+			Vec3d baseVel = new Vec3d(BackportUtil.readVec3fFromByteBuf(buf));
 			float randomness = buf.readFloat();
 			int amount = buf.readInt();
 			float size = buf.readFloat();
@@ -57,7 +58,7 @@ public class PacketRegistry
 					return;
 				for (int i = 0; i < amount; i++)
 				{
-					Vec3d vel = baseVel.addRandom(client.world.random, randomness);
+					Vec3d vel = BackportUtil.addRandomVector(baseVel, client.world.random, randomness);
 					if(isOverridden)
 						client.world.addParticle(new GoopDropParticleEffect(Vec3d.unpackRgb(color), size, mature, waterHandling, effectOverride, data).setDrip(drip).setDeform(deform),
 								pos.x, pos.y, pos.z, vel.x, vel.y, vel.z);

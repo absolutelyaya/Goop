@@ -6,9 +6,9 @@ import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.particle.ParticleEffect;
-import net.minecraft.registry.Registries;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.Registry;
 
 import java.util.Locale;
 
@@ -60,7 +60,7 @@ public abstract class AbstractGoopParticleEffect implements ParticleEffect
 	public String asString()
 	{
 		return String.format(Locale.ROOT, "%s %.2f %.2f %.2f %.2f, %s",
-				Registries.PARTICLE_TYPE.getId(this.getType()), this.color.getX(), this.color.getY(), this.color.getZ(), this.scale, this.mature);
+				Registry.PARTICLE_TYPE.getId(this.getType()), this.color.getX(), this.color.getY(), this.color.getZ(), this.scale, this.mature);
 	}
 	
 	public Vec3d getColor() {

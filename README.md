@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-    modImplementation(include 'com.github.absolutelyaya:goop:fabric-1.20.1-v0.2')
+    modImplementation(include 'com.github.absolutelyaya:goop:1.19.1-SNAPSHOT')
 }
 ```
 And that's pretty much it. You can now use the Goop Particles as you want; You can spawn them like any other particle; or we do something a bit cleaner.
@@ -46,7 +46,7 @@ Go to your Goop Initializer Class. This next bit of Code is a bit intimidating, 
 GoopEmitterRegistry.registerEmitter(EntityType.SLIME, new DamageGoopEmitter<SlimeEntity>(
 		(slime, data) -> 0x2caa3b,
 		(slime, data) -> new Vector4f(0f, 0f, 0f, MathHelper.clamp(data.amount() / 8f, 0.25f, 2f)),
-		(slime, data) -> data.source().isIn(TagRegistry.PHYSICAL) ? Math.round(MathHelper.clamp(data.amount() / 2f, 2f, 12f)) : 0,
+		(slime, data) -> !data.source().isMagic() ? Math.round(MathHelper.clamp(data.amount() / 2f, 2f, 12f)) : 0,
 		(slime, data) -> MathHelper.clamp(data.amount() / 4f, 0.25f, 1)
 ));
 ```
@@ -57,7 +57,7 @@ The most intimidating bit are the parameters for the Emitter;<br>
 Each Argument is a ``BiFunction<>``. You get the instance of the entity and a ``DamageData`` which contains, damage amount and source. 
 1. Color<br>Either hook up a method or use a Lambda to return an RGB color in int form.
 2. Velocity<br>Return a Vector4f; the first 3 values are the direction and the fourth value is used for added randomness.<br>In The Example, Goop flies in all directions completely at random; the higher the damage, the higher the Velocity.
-3. Amount<br>Return the amount of particles as an Int. In the example, Only Physical Damage will actually emit Goop; meaning Fire or Poison Damage would get ignored. If that's what you want is up to you of course.
+3. Amount<br>Return the amount of particles as an Int. In the example, Only Non-Magic Damage will actually emit Goop; meaning Fire or Poison Damage would get ignored. If that's what you want is up to you of course.
 4. Size<br>Finally return a float representing the size of the goop. In the example, higher damage results in bigger Goop.
 
 And there you go, Slimes now splatter apart when damaged. Wonderful!<br>

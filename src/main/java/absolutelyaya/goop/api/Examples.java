@@ -1,7 +1,6 @@
 package absolutelyaya.goop.api;
 
 import absolutelyaya.goop.Goop;
-import absolutelyaya.goop.registries.TagRegistry;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.entity.mob.ZombieEntity;
@@ -10,7 +9,7 @@ import net.minecraft.entity.projectile.thrown.EggEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import org.joml.Vector4f;
+import net.minecraft.util.math.Vector4f;
 
 public class Examples implements GoopInitializer
 {
@@ -31,16 +30,16 @@ public class Examples implements GoopInitializer
 		GoopEmitterRegistry.registerEmitter(EntityType.SLIME, new DamageGoopEmitter<SlimeEntity>(
 				(slime, data) -> 0x2caa3b,
 				(slime, data) -> new Vector4f(0f, 0f, 0f, MathHelper.clamp(data.amount() / 8f, 0.25f, 2f)),
-				(slime, data) -> data.source().isIn(TagRegistry.PHYSICAL) ? Math.round(MathHelper.clamp(data.amount() / 2f, 2f, 12f)) : 0,
+				(slime, data) -> !data.source().isMagic() ? Math.round(MathHelper.clamp(data.amount() / 2f, 2f, 12f)) : 0,
 				(slime, data) -> MathHelper.clamp(data.amount() / 4f, 0.25f, 1)
 		).markDev());
 		
-		//This causes Zombies to bleed when Damaged by a Physical Attack.
+		//This causes Zombies to bleed when Damaged by a non-magic Attack.
 		//If the Client has Censor Mature Content on, these particles will render in their Censor Color.
 		GoopEmitterRegistry.registerEmitter(EntityType.ZOMBIE, new DamageGoopEmitter<ZombieEntity>(
 				(zombie, data) -> 0x940904,
 				(zombie, data) -> new Vector4f(0f, 0f, 0f, MathHelper.clamp(data.amount() / 8f, 0.25f, 2f)),
-				(zombie, data) -> data.source().isIn(TagRegistry.PHYSICAL) ? Math.round(MathHelper.clamp(data.amount() / 2f, 2f, 12f)) : 0,
+				(zombie, data) -> !data.source().isMagic() ? Math.round(MathHelper.clamp(data.amount() / 2f, 2f, 12f)) : 0,
 				(zombie, data) -> MathHelper.clamp(data.amount() / 4f, 0.25f, 1)
 		).markDev().markMature());
 		
