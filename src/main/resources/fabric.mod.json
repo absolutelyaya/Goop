@@ -35,7 +35,7 @@
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": "*",
-    "minecraft": "1.19.1"
+    "minecraft": ">=1.19.1 <=1.19.2"
   },
   "custom": {
     "modmenu": {

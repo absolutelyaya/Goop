@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-    modImplementation(include 'com.github.absolutelyaya:goop:1.19.1-SNAPSHOT')
+    modImplementation(include 'com.github.absolutelyaya:goop:1.19-SNAPSHOT')
 }
 ```
 And that's pretty much it. You can now use the Goop Particles as you want; You can spawn them like any other particle; or we do something a bit cleaner.
