@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "goop",
+  "version": "${version}",
+  "name": "Goop",
+  "description": "Goop Technology",
+  "authors": [],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/goop/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "absolutelyaya.goop.client.GoopClient"
+    ],
+    "main": [
+      "absolutelyaya.goop.Goop"
+    ]
+  },
+  "mixins": [
+    "goop.mixins.json",
+    {
+      "config": "goop.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
