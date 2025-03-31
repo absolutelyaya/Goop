@@ -10,6 +10,7 @@ public class Goop implements ModInitializer
 {
 	public static final String MOD_ID = "goop";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+	//TODO: implement yayConfig
 	
 	@Override
 	public void onInitialize()

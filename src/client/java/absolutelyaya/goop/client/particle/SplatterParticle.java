@@ -1,53 +1,52 @@
 package absolutelyaya.goop.client.particle;
 
+import absolutelyaya.goop.particle.BaseGoopData;
+import absolutelyaya.goop.particle.PuddleParticleEffect;
 import absolutelyaya.goop.particle.SplatterParticleEffect;
 import absolutelyaya.goop.particle.WaterHandling;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
-import java.awt.color.ColorSpace;
 import java.util.List;
 
 public class SplatterParticle extends SpriteBillboardParticle
 {
 	protected final SpriteProvider spriteProvider;
-	protected final boolean mature, drip, deform;
-	final int color;
+	final BaseGoopData data;
 	final float rotSpeed;
-	final WaterHandling waterHandling;
 	final Identifier effectOverride;
 	
-	protected SplatterParticle(ClientWorld clientWorld, Vec3d pos, Vec3d vel, SpriteProvider provider, int color, float scale,
-							   boolean mature, boolean drip, boolean deform, WaterHandling waterHandling, Identifier effectOverride)
+	protected SplatterParticle(ClientWorld clientWorld, Vec3d pos, Vec3d vel, SpriteProvider provider, BaseGoopData data, Identifier effectOverride)
 	{
 		super(clientWorld, pos.x, pos.y, pos.z);
 		spriteProvider = provider;
-		this.color = color;
-		this.scale = scale - (scale > 1f ? 1.25f * (scale / 2f) : 0f);
+		this.data = data;
+		this.scale = data.scale() - (data.scale() > 1f ? 1.25f * (data.scale() / 2f) : 0f);
 		this.rotSpeed = (random.nextFloat() - 0.5f) / 4f / scale;
-		this.mature = mature;
-		this.drip = drip;
-		this.deform = deform;
-		this.waterHandling = waterHandling;
 		this.effectOverride = effectOverride;
 		sprite = spriteProvider.getSprite(random);
 		gravityStrength = 1 + scale / 2;
 		maxAge = 300;
 		collidesWithWorld = true;
-		float[] c = new Color(color).getColorComponents(null);
+		float[] c = new Color(data.color(), true).getColorComponents(null);
 		if(c.length >= 3)
 			setColor(c[0], c[1], c[2]);
+		if(c.length >= 4)
+			alpha = c[3];
 		
 		if(vel.length() > 0f)
 			setVelocity(vel.x, vel.y, vel.z);
@@ -69,16 +68,16 @@ public class SplatterParticle extends SpriteBillboardParticle
 		angle += rotSpeed;
 		if(world.getFluidState(new BlockPos((int)x, (int)y, (int)z)).isIn(FluidTags.LAVA))
 			markDead();
-		if(waterHandling == WaterHandling.IGNORE)
+		if(data.waterHandling() == WaterHandling.IGNORE)
 			return;
 		if(world.isWater(new BlockPos((int)x, (int)y, (int)z)))
 		{
-			switch(waterHandling)
+			switch(data.waterHandling())
 			{
 				case REMOVE_PARTICLE -> markDead();
 				case REPLACE_WITH_CLOUD_PARTICLE ->
 				{
-					world.addParticleClient(new DustParticleEffect(color, scale * 2.5f), x, y, z,
+					world.addParticleClient(new DustParticleEffect(data.color(), scale * 2.5f), x, y, z,
 							random.nextFloat() * 0.1f, random.nextFloat() * 0.1f, random.nextFloat() * 0.1f);
 					markDead();
 				}
@@ -112,7 +111,7 @@ public class SplatterParticle extends SpriteBillboardParticle
 			}
 		}
 		offset = offset.normalize();
-		Vec3d pos = new Vec3d(x, y, z).add(offset);
+		Vec3d pos = new Vec3d(x, y, z);
 		Direction dir;
 		if(Math.abs(offset.y) > Math.abs(offset.x) && Math.abs(offset.y) > Math.abs(offset.z))
 			dir = offset.y > 0 ? Direction.UP : Direction.DOWN;
@@ -125,7 +124,9 @@ public class SplatterParticle extends SpriteBillboardParticle
 	
 	void placePuddle(Vec3d pos, Direction dir)
 	{
-		//TODO: world.addParticleClient(new PuddleParticleEffect());
+		HitResult hit = world.raycast(new RaycastContext(pos, pos.offset(dir, 16), RaycastContext.ShapeType.VISUAL, RaycastContext.FluidHandling.NONE, ShapeContext.absent()));
+		
+		world.addParticleClient(new PuddleParticleEffect(data, dir.getOpposite()), hit.getPos().x, hit.getPos().y, hit.getPos().z, 0, 0, 0);
 		markDead();
 	}
 	
@@ -142,9 +143,8 @@ public class SplatterParticle extends SpriteBillboardParticle
 		@Override
 		public Particle createParticle(SplatterParticleEffect parameters, ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ)
 		{
-			return new SplatterParticle(world, new Vec3d(x, y, z), new Vec3d(velocityX, velocityY, velocityZ),
-					spriteProvider, parameters.getColor(), parameters.getScale(), parameters.isMature(), parameters.isDrip(), parameters.isDeform(),
-					parameters.getWaterHandling(), parameters.getEffectOverride());
+			return new SplatterParticle(world, new Vec3d(x, y, z), new Vec3d(velocityX, velocityY, velocityZ), spriteProvider, parameters.data(),
+					parameters.effectOverride().orElse(null));
 		}
 	}
 }
