@@ -10,31 +10,31 @@ import net.minecraft.particle.ParticleType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.dynamic.Codecs;
 
-public class GoopDropParticleEffect extends AbstractGoopParticleEffect
+public class SplatterParticleEffect extends AbstractGoopParticleEffect
 {
 	Identifier effectOverride;
-	public static final MapCodec<GoopDropParticleEffect> CODEC = RecordCodecBuilder.mapCodec(
+	public static final MapCodec<SplatterParticleEffect> CODEC = RecordCodecBuilder.mapCodec(
 			instance -> instance.group(
 					Codecs.RGB.fieldOf("color").forGetter(AbstractGoopParticleEffect::getColor),
 					Codecs.POSITIVE_FLOAT.fieldOf("scale").forGetter(AbstractGoopParticleEffect::getScale),
 					PrimitiveCodec.BOOL.fieldOf("mature").forGetter(AbstractGoopParticleEffect::isMature),
 					WaterHandling.CODEC.fieldOf("waterhandling").forGetter(AbstractGoopParticleEffect::getWaterHandling)
-					).apply(instance, GoopDropParticleEffect::new)
+					).apply(instance, SplatterParticleEffect::new)
 	);
-	public static final PacketCodec<RegistryByteBuf, GoopDropParticleEffect> PACKET_CODEC = PacketCodec.tuple(
+	public static final PacketCodec<RegistryByteBuf, SplatterParticleEffect> PACKET_CODEC = PacketCodec.tuple(
 			PacketCodecs.INTEGER, AbstractGoopParticleEffect::getColor,
 			PacketCodecs.FLOAT, AbstractGoopParticleEffect::getScale,
 			PacketCodecs.BOOLEAN, AbstractGoopParticleEffect::isMature,
 			PacketCodecs.indexed(i -> WaterHandling.values()[i], WaterHandling::ordinal), AbstractGoopParticleEffect::getWaterHandling,
-			GoopDropParticleEffect::new
+			SplatterParticleEffect::new
 	);
 	
-	public GoopDropParticleEffect(int color, float scale, boolean mature, WaterHandling waterHandling)
+	public SplatterParticleEffect(int color, float scale, boolean mature, WaterHandling waterHandling)
 	{
 		super(color, scale, mature, waterHandling);
 	}
 	
-	public GoopDropParticleEffect(int color, float scale, boolean mature, WaterHandling waterHandling, Identifier effectOverride)
+	public SplatterParticleEffect(int color, float scale, boolean mature, WaterHandling waterHandling, Identifier effectOverride)
 	{
 		super(color, scale, mature, waterHandling);
 		this.effectOverride = effectOverride;
@@ -43,7 +43,7 @@ public class GoopDropParticleEffect extends AbstractGoopParticleEffect
 	@Override
 	public ParticleType<?> getType()
 	{
-		return ParticleEffects.GOOP_DROP;
+		return ParticleEffects.SPLATTER;
 	}
 	
 	public Identifier getEffectOverride()

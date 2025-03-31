@@ -12,6 +12,7 @@ base {
 
 loom {
     splitEnvironmentSourceSets()
+    accessWidenerPath = file("src/main/resources/goop.accesswidener")
 
     mods {
         "goop" {

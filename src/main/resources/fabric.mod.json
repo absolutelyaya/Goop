@@ -9,6 +9,7 @@
   "license": "MIT",
   "icon": "assets/goop/icon.png",
   "environment": "client",
+  "accessWidener": "goop.accesswidener",
   "entrypoints": {
     "client": [
       "absolutelyaya.goop.client.GoopClient"

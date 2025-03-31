@@ -8,15 +8,15 @@ import net.minecraft.registry.Registry;
 
 public class ParticleEffects
 {
-	public static final ParticleType<GoopDropParticleEffect> GOOP_DROP =
-			Registry.register(Registries.PARTICLE_TYPE, Goop.id( "goop_drop"),
-					FabricParticleTypes.complex(GoopDropParticleEffect.CODEC, GoopDropParticleEffect.PACKET_CODEC));
-	public static final ParticleType<GoopParticleEffect> GOOP =
-			Registry.register(Registries.PARTICLE_TYPE, Goop.id( "goop"),
-					FabricParticleTypes.complex(new GoopParticleEffect.Factory()));
-	public static final ParticleType<GoopStringParticleEffect> GOOP_STRING =
-			Registry.register(Registries.PARTICLE_TYPE, Goop.id( "goop_string"),
-					FabricParticleTypes.complex(new GoopStringParticleEffect.Factory()));
+	public static final ParticleType<SplatterParticleEffect> SPLATTER =
+			Registry.register(Registries.PARTICLE_TYPE, Goop.id( "splatter"),
+					FabricParticleTypes.complex(SplatterParticleEffect.CODEC, SplatterParticleEffect.PACKET_CODEC));
+	//public static final ParticleType<GoopParticleEffect> PUDDLE =
+	//		Registry.register(Registries.PARTICLE_TYPE, Goop.id( "puddle"),
+	//				FabricParticleTypes.complex(new GoopParticleEffect.Factory()));
+	//public static final ParticleType<GoopStringParticleEffect> DRIP =
+	//		Registry.register(Registries.PARTICLE_TYPE, Goop.id( "drip"),
+	//				FabricParticleTypes.complex(new GoopStringParticleEffect.Factory()));
 	
 	public static void register()
 	{
