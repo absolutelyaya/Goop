@@ -14,9 +14,9 @@ public class ParticleEffects
 	public static final ParticleType<PuddleParticleEffect> PUDDLE =
 			Registry.register(Registries.PARTICLE_TYPE, Goop.id( "puddle"),
 					FabricParticleTypes.complex(PuddleParticleEffect.CODEC, PuddleParticleEffect.PACKET_CODEC));
-	//public static final ParticleType<GoopStringParticleEffect> DRIP =
-	//		Registry.register(Registries.PARTICLE_TYPE, Goop.id( "drip"),
-	//				FabricParticleTypes.complex(new GoopStringParticleEffect.Factory()));
+	public static final ParticleType<DripParticleEffect> DRIP =
+			Registry.register(Registries.PARTICLE_TYPE, Goop.id( "drip"),
+					FabricParticleTypes.complex(DripParticleEffect.CODEC, DripParticleEffect.PACKET_CODEC));
 	
 	public static void register()
 	{

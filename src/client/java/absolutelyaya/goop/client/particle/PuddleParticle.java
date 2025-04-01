@@ -1,8 +1,10 @@
 package absolutelyaya.goop.client.particle;
 
 import absolutelyaya.goop.particle.BaseGoopData;
+import absolutelyaya.goop.particle.DripParticleEffect;
 import absolutelyaya.goop.particle.PuddleParticleEffect;
 import absolutelyaya.goop.particle.WaterHandling;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.ParticleTextureSheet;
@@ -10,10 +12,12 @@ import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.registry.tag.FluidTags;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayDeque;
@@ -72,11 +76,16 @@ public class PuddleParticle extends SurfaceAlignedParticle
 					markDead();
 			}
 		}
-		//TODO: Ceiling Drips
-		//if(data.drip() && up.equals(Direction.DOWN) && random.nextInt(120) == 0)
-		//	world.addParticleClient(new GoopStringParticleEffect(color, 0.25f, mature),
-		//			x + random.nextFloat() * scale - scale / 2f, y, z + random.nextFloat() * scale - scale / 2f,
-		//			0, 0, 0);
+		if(data.drip() && up.equals(Direction.DOWN) && random.nextInt(120) == 0)
+		{
+			Vec3d pos = new Vec3d(x + random.nextFloat() * scale - scale / 2f, y, z + random.nextFloat() * scale - scale / 2f);
+			HitResult hitUp = world.raycast(new RaycastContext(pos, pos.add(0f, 0.05f, 0f),
+					RaycastContext.ShapeType.VISUAL, RaycastContext.FluidHandling.NONE, ShapeContext.absent()));
+			HitResult hitDown = world.raycast(new RaycastContext(pos, pos.add(0f, -0.05f, 0f),
+					RaycastContext.ShapeType.VISUAL, RaycastContext.FluidHandling.NONE, ShapeContext.absent()));
+			if(!hitUp.getType().equals(HitResult.Type.MISS) && hitDown.getType().equals(HitResult.Type.MISS))
+				world.addParticleClient(new DripParticleEffect(data.color(), 0.25f, data.mature()), pos.x, pos.y, pos.z, 0, 0, 0);
+		}
 		//Fluid handling
 		if(world.getFluidState(new BlockPos((int)x, (int)y, (int)z)).isIn(FluidTags.LAVA))
 			markDead();
