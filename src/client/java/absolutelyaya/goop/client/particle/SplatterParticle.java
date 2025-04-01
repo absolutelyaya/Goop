@@ -51,7 +51,10 @@ public class SplatterParticle extends SpriteBillboardParticle
 		if(vel.length() > 0f)
 			setVelocity(vel.x, vel.y, vel.z);
 		else
-			setVelocity((random.nextFloat() - 0.5f) / 2f, random.nextFloat() * 0.5f, (random.nextFloat() - 0.5f) / 2f);
+		{
+			Vec3d dir = new Vec3d(0, 0, random.nextFloat() / 2f).rotateY((float)Math.toRadians(random.nextFloat() * 360f));
+			setVelocity(dir.x, random.nextFloat() * 0.5f, dir.z);
+		}
 	}
 	
 	@Override
@@ -115,7 +118,7 @@ public class SplatterParticle extends SpriteBillboardParticle
 		Direction dir;
 		if(Math.abs(offset.y) > Math.abs(offset.x) && Math.abs(offset.y) > Math.abs(offset.z))
 			dir = offset.y > 0 ? Direction.UP : Direction.DOWN;
-		else if(Math.abs(x) > Math.abs(z))
+		else if(Math.abs(offset.x) > Math.abs(offset.z))
 			dir = offset.x > 0 ? Direction.EAST : Direction.WEST;
 		else
 			dir = offset.z > 0 ? Direction.SOUTH : Direction.NORTH;
@@ -124,9 +127,9 @@ public class SplatterParticle extends SpriteBillboardParticle
 	
 	void placePuddle(Vec3d pos, Direction dir)
 	{
-		HitResult hit = world.raycast(new RaycastContext(pos, pos.offset(dir, 16), RaycastContext.ShapeType.VISUAL, RaycastContext.FluidHandling.NONE, ShapeContext.absent()));
-		
-		world.addParticleClient(new PuddleParticleEffect(data, dir.getOpposite()), hit.getPos().x, hit.getPos().y, hit.getPos().z, 0, 0, 0);
+		HitResult hit = world.raycast(new RaycastContext(pos.offset(dir.getOpposite(), 0.2), pos.offset(dir, 16), RaycastContext.ShapeType.VISUAL, RaycastContext.FluidHandling.NONE, ShapeContext.absent()));
+		Vec3d correctedHitPos = (hit.getType().equals(HitResult.Type.MISS) ? pos : hit.getPos()).offset(dir.getOpposite(), 0.005);
+		world.addParticleClient(new PuddleParticleEffect(data, dir.getOpposite()), correctedHitPos.x, correctedHitPos.y, correctedHitPos.z, 0, 0, 0);
 		markDead();
 	}
 	

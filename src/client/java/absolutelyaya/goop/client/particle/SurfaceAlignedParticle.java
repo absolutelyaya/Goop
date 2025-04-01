@@ -2,6 +2,7 @@ package absolutelyaya.goop.client.particle;
 
 import absolutelyaya.goop.particle.BaseGoopData;
 import com.google.common.collect.ImmutableList;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.particle.SpriteBillboardParticle;
 import net.minecraft.client.particle.SpriteProvider;
@@ -11,8 +12,9 @@ import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
-import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.world.RaycastContext;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -53,15 +55,18 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 				if(up.getAxis().isVertical())
 					vert = new Vec3d(vx / subdivisions - 0.5f, 0f, vy / subdivisions - 0.5f);
 				else
-					vert = new Vec3d(Math.abs(up.getOffsetZ()) * vx / subdivisions - 0.5f, vy / subdivisions - 0.5f, Math.abs(up.getOffsetX()) * vx / subdivisions - 0.5f);
+				{
+					float x = up.getOffsetX(), z = up.getOffsetZ();
+					vert = new Vec3d(z * vx / subdivisions, vy / subdivisions, x * vx / subdivisions);
+				}
 				vert = vert.add(up.getDoubleVector().multiply(random.nextFloat() / 50f)); //fight Z-Fighting
 				Vec2f uv = new Vec2f(MathHelper.lerp(vx / subdivisions, getMinU(), getMaxU()), MathHelper.lerp(vy / subdivisions, getMinV(), getMaxV()));
 				
 				float maxDeform;
 				if(up.getAxis().isVertical())
-					maxDeform = random.nextFloat() * 0.5f;
+					maxDeform = (float)Math.pow(random.nextFloat(), 4f) * 0.65f;
 				else
-					maxDeform = random.nextBoolean() ? random.nextFloat() * 0.25f * data.scale() : 0;
+					maxDeform = random.nextBoolean() ? random.nextFloat() * 0.2f * data.scale() : 0;
 				builder.add(new Vertex(vert, true, uv, maxDeform));
 			}
 		}
@@ -71,7 +76,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 	@Override
 	public void render(VertexConsumer vertexConsumer, Camera camera, float delta)
 	{
-		boolean debug = /*config.goopDebug &&*/ !MinecraftClient.getInstance().isPaused();
+		boolean debug = /*config.goopDebug &&*/ !MinecraftClient.getInstance().isPaused() && false;
 		if(vertices.isEmpty())
 			return;
 		boolean fancy = isFancy();
@@ -89,12 +94,9 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 		{
 			Vec3d v = verts.get(i);
 			//random rotation
-			v = v.rotateX(up.getOffsetZ() * angle);
+			v = v.rotateX(up.getOffsetX() * angle);
 			v = v.rotateY(up.getOffsetY() * angle);
 			v = v.rotateZ(up.getOffsetZ() * angle);
-			//deformation
-			if(data.deforms() && !(up.equals(Direction.DOWN)) && isFancy())
-				v = v.subtract(new Vec3d(0, deformation * vertices.get(i).maxDeform, 0));
 			v = v.multiply(scale);
 			verts.set(i, v.add(dx, dy, dz));
 		}
@@ -113,7 +115,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 				
 				boolean render = !fancy || vertices.get(vi).visible;
 				
-				if(fancy && up.equals(Direction.DOWN) && vertices.get(vi).visible)
+				if(fancy && vertices.get(vi).visible && isProcessFancy())
 				{
 					//calculate face center
 					Vec3d faceCenter = faceVerts[0];
@@ -123,16 +125,29 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 					faceCenter = faceCenter.multiply(0.25f);
 					//check if position of this face is attached to a valid surface
 					Vec3d v = camPos.add(faceCenter);
-					render = isValidPos(v);
+						render = isValidPos(v);
 					if(!render)
+					{
 						vertices.get(vi).visible = false; //so faces don't reappear after being removed
+						continue;
+					}
 					
-					if(debug)
+					//deformation
+					if(data.deforms() && !(up.equals(Direction.UP)))
+					{
+						faceVerts[0] = faceVerts[0].subtract(new Vec3d(0, deformation * vertices.get(vi).maxDeform, 0));
+						faceVerts[1] = faceVerts[1].subtract(new Vec3d(0, deformation * vertices.get((int)(vi + targetSize + 1)).maxDeform, 0));
+						faceVerts[2] = faceVerts[2].subtract(new Vec3d(0, deformation * vertices.get((int)(vi + targetSize + 2)).maxDeform, 0));
+						faceVerts[3] = faceVerts[3].subtract(new Vec3d(0, deformation * vertices.get(vi + 1).maxDeform, 0));
+					}
+					
+					if(debug && age % 10 == 0)
 					{
 						//face normal, emitted from center
+						Vec3d vel = up.getDoubleVector().multiply(0.05f);
 						world.addParticleClient(ParticleTypes.FLAME,
 								camPos.x + faceCenter.getX(), camPos.y + faceCenter.getY() + 0.1, camPos.z + faceCenter.getZ(),
-								0, 0.05, 0);
+								vel.x, vel.y, vel.z);
 					}
 					
 					//if(config.wrapToEdges && this.targetSize >= 2)
@@ -178,14 +193,10 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 							texture(vertices.get(vi).uv.x, vertices.get(vi).uv.y)
 							.color(this.red, this.green, this.blue, this.alpha).light(brightness);
 				}
-				//vertices.get(vi).pos = faceVerts[0];
-				//vertices.get((int)(vi + targetSize + 1)).pos = faceVerts[1];
-				//vertices.get((int)(vi + targetSize + 2)).pos = faceVerts[2];
-				//vertices.get(vi + 1).pos = faceVerts[3];
 			}
 		}
 		
-		if(debug)
+		if(debug && age % 3 == 0)
 		{
 			//goop Vertices, colored based on UVs
 			for (int i = 0; i < verts.size(); i++)
@@ -202,27 +213,31 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 	
 	boolean isFancy()
 	{
-		return false && MinecraftClient.getInstance().gameRenderer.getCamera().getPos().squaredDistanceTo(x, y, z) < 32; //TODO: config && ...
+		return MinecraftClient.getInstance().gameRenderer.getCamera().getPos().squaredDistanceTo(x, y, z) < 64 * 64; //TODO: config && ...
+	}
+	
+	boolean isProcessFancy()
+	{
+		return MinecraftClient.getInstance().gameRenderer.getCamera().getPos().squaredDistanceTo(x, y, z) < 32 * 32;
 	}
 	
 	boolean isValidPos(Vec3d pos)
 	{
-		BlockPos blockPos = BlockPos.ofFloored(pos);
-		VoxelShape shape = world.getBlockState(blockPos).getCollisionShape(world, blockPos);
-		if(!shape.isEmpty() && shape.getBoundingBox().offset(blockPos).contains(pos))
+		HitResult hit = world.raycast(new RaycastContext(pos, pos.offset(up, 0.15f),
+				RaycastContext.ShapeType.VISUAL, RaycastContext.FluidHandling.NONE, ShapeContext.absent()));
+		if(!hit.getType().equals(HitResult.Type.MISS))
 			return false;
-		Vec3d attachedPos = pos.subtract(up.getDoubleVector().multiply(0.065f));
-		BlockPos attachedBlockPos = BlockPos.ofFloored(attachedPos);
-		VoxelShape attachedShape = world.getBlockState(attachedBlockPos).getCollisionShape(world, attachedBlockPos);
-		return !attachedShape.isEmpty() && attachedShape.getBoundingBox().offset(attachedBlockPos).contains(attachedPos);
+		hit = world.raycast(new RaycastContext(pos, pos.offset(up.getOpposite(), 0.15f),
+				RaycastContext.ShapeType.VISUAL, RaycastContext.FluidHandling.NONE, ShapeContext.absent()));
+		return !hit.getType().equals(HitResult.Type.MISS);
 	}
 	
 	@Override
 	public void tick()
 	{
 		super.tick();
-		//if(!isValidPos(new Vec3d(x, y, z)))
-		//	markDead();
+		if(!isValidPos(new Vec3d(x, y, z)))
+			markDead();
 		if(data.deforms())
 			deformation = (float)age / maxAge;
 	}
@@ -255,6 +270,4 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 			this.maxDeform = maxDeform;
 		}
 	}
-	
-	
 }
