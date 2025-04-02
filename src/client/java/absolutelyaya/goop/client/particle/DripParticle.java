@@ -1,5 +1,6 @@
 package absolutelyaya.goop.client.particle;
 
+import absolutelyaya.goop.client.GoopClient;
 import absolutelyaya.goop.particle.DripParticleEffect;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.render.Camera;
@@ -15,16 +16,17 @@ public class DripParticle extends SpriteBillboardParticle
 {
 	protected final SpriteProvider spriteProvider;
 	
-	Vec3d scale;
+	Vec3d curScale, lastScale;
 	float speed;
 	
-	protected DripParticle(ClientWorld world, Vec3d pos, SpriteProvider spriteProvider, int color, float scale, boolean mature)
+	protected DripParticle(ClientWorld world, Vec3d pos, SpriteProvider spriteProvider, int color, float scale)
 	{
 		super(world, pos.x, pos.y - 0.25, pos.z);
 		this.spriteProvider = spriteProvider;
 		sprite = spriteProvider.getSprite(random);
 		maxAge = random.nextInt(30) + 20;
-		this.scale = new Vec3d(random.nextFloat() * scale * 0.33f, 0, random.nextFloat() * scale * 0.33f);
+		curScale = new Vec3d(random.nextFloat() * scale * 0.33f, 0, random.nextFloat() * scale * 0.33f);
+		lastScale = curScale;
 		collidesWithWorld = true;
 		alpha = 0;
 		speed = 1.5f + random.nextFloat() * 1.5f;
@@ -48,7 +50,10 @@ public class DripParticle extends SpriteBillboardParticle
 		super.tick();
 		alpha = Math.min(MathHelper.lerp((float)age / maxAge, 2f, 0f), 1f);
 		if (!onGround)
-			scale = new Vec3d(scale.x, Math.pow(age / (float)maxAge, speed) * 2, scale.z);
+		{
+			lastScale = curScale;
+			curScale = new Vec3d(curScale.x, Math.pow(age / (float)maxAge, speed) * 2, curScale.z);
+		}
 	}
 	
 	@Override
@@ -67,7 +72,7 @@ public class DripParticle extends SpriteBillboardParticle
 				new Vec3d(1f, -2f, 0f)};
 		
 		for(int k = 0; k < 4; ++k)
-			Vec3ds[k] = Vec3ds[k].rotateY((float)Math.atan2(dir.x, dir.z)).multiply(scale).add(dx, dy, dz);
+			Vec3ds[k] = Vec3ds[k].rotateY((float)Math.atan2(dir.x, dir.z)).multiply(lastScale.lerp(curScale, delta)).add(dx, dy, dz);
 		
 		int n = this.getBrightness(delta);
 		vertexConsumer.vertex((float)Vec3ds[0].getX(), (float)Vec3ds[0].getY(), (float)Vec3ds[0].getZ())
@@ -93,7 +98,7 @@ public class DripParticle extends SpriteBillboardParticle
 		@Override
 		public Particle createParticle(DripParticleEffect parameters, ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ)
 		{
-			return new DripParticle(world, new Vec3d(x, y, z), spriteProvider, parameters.color(), parameters.scale(), parameters.mature());
+			return new DripParticle(world, new Vec3d(x, y, z), spriteProvider, GoopClient.getColorOrCensor(parameters.color(), parameters.mature()), parameters.scale());
 		}
 	}
 }

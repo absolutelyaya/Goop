@@ -1,5 +1,7 @@
 package absolutelyaya.goop.client.particle;
 
+import absolutelyaya.goop.client.GoopClient;
+import absolutelyaya.goop.client.config.GoopClientConfig;
 import absolutelyaya.goop.particle.BaseGoopData;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.ShapeContext;
@@ -31,14 +33,15 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 	protected SurfaceAlignedParticle(ClientWorld clientWorld, Vec3d pos, SpriteProvider spriteProvider, BaseGoopData data, Direction up)
 	{
 		super(clientWorld, pos.x, pos.y, pos.z);
-		this.maxAge = /*config.permanent ? Integer.MAX_VALUE : */200 + random.nextInt(100);
+		this.maxAge = GoopClientConfig.INSTANCE.permanent.getValue() ? Integer.MAX_VALUE : 200 + random.nextInt(100);
 		this.spriteProvider = spriteProvider;
 		this.data = data;
 		this.up = up;
 		sprite = spriteProvider.getSprite(random);
 		gravityStrength = 0;
-		angle = random.nextFloat() * 360; //TODO: add config for random rotation
-		float[] c = new Color(data.color(), true).getColorComponents(null);
+		if(GoopClientConfig.INSTANCE.puddleRot.getValue())
+			angle = random.nextFloat() * 360;
+		float[] c = new Color(GoopClient.getColorOrCensor(data), true).getColorComponents(null);
 		if(c.length >= 3)
 			setColor(c[0], c[1], c[2]);
 		if(c.length >= 4)
@@ -76,7 +79,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 	@Override
 	public void render(VertexConsumer vertexConsumer, Camera camera, float delta)
 	{
-		boolean debug = /*config.goopDebug &&*/ !MinecraftClient.getInstance().isPaused() && false;
+		boolean debug = GoopClientConfig.INSTANCE.debug.getValue() && !MinecraftClient.getInstance().isPaused();
 		if(vertices.isEmpty())
 			return;
 		boolean fancy = isFancy();
@@ -150,7 +153,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 								vel.x, vel.y, vel.z);
 					}
 					
-					//if(config.wrapToEdges && this.targetSize >= 2)
+					//if(config.wrapToEdges && data.scale() >= 2)
 					//{
 					//	for (int i = 0; i < faceVerts.length; i++)
 					//	{
@@ -213,12 +216,14 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 	
 	boolean isFancy()
 	{
-		return MinecraftClient.getInstance().gameRenderer.getCamera().getPos().squaredDistanceTo(x, y, z) < 64 * 64; //TODO: config && ...
+		if(!GoopClientConfig.INSTANCE.fancy.getValue())
+			return false;
+		return MinecraftClient.getInstance().gameRenderer.getCamera().getPos().squaredDistanceTo(x, y, z) < 64 * 64;
 	}
 	
 	boolean isProcessFancy()
 	{
-		return MinecraftClient.getInstance().gameRenderer.getCamera().getPos().squaredDistanceTo(x, y, z) < 32 * 32;
+		return isFancy() && MinecraftClient.getInstance().gameRenderer.getCamera().getPos().squaredDistanceTo(x, y, z) < 32 * 32;
 	}
 	
 	boolean isValidPos(Vec3d pos)

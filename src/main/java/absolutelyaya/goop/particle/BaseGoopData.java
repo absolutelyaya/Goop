@@ -30,10 +30,4 @@ public record BaseGoopData(int color, float scale, boolean mature, WaterHandling
 	{
 		this(color, scale, mature, waterHandling, true, true);
 	}
-	
-	public int color()
-	{
-		//TODO: handle mature censor color config
-		return color;
-	}
 }

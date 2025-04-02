@@ -1,5 +1,7 @@
 package absolutelyaya.goop.client.particle;
 
+import absolutelyaya.goop.client.GoopClient;
+import absolutelyaya.goop.client.config.GoopClientConfig;
 import absolutelyaya.goop.particle.BaseGoopData;
 import absolutelyaya.goop.particle.DripParticleEffect;
 import absolutelyaya.goop.particle.PuddleParticleEffect;
@@ -9,6 +11,8 @@ import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.particle.ParticleTextureSheet;
 import net.minecraft.client.particle.SpriteProvider;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.registry.tag.FluidTags;
@@ -31,16 +35,17 @@ public class PuddleParticle extends SurfaceAlignedParticle
 	private final float baseAlpha;
 	private final int appearTicks;
 	float rain;
+	float lastScale, curScale;
 	
 	protected PuddleParticle(ClientWorld clientWorld, Vec3d pos, SpriteProvider spriteProvider, BaseGoopData data, Direction up)
 	{
 		super(clientWorld, pos, spriteProvider, data, up);
 		alpha = Math.min(random.nextFloat() + 0.5f, 1);
-		baseAlpha = 1f;
+		baseAlpha = alpha;
 		scale = 0f;
 		appearTicks = random.nextInt(4) + 3;
 		GOOP_QUEUE.add(this);
-		if(GOOP_QUEUE.size() > /*config.goopCap*/ 420) //TODO: add config
+		if(GOOP_QUEUE.size() > GoopClientConfig.INSTANCE.goopCap.getValue())
 			GOOP_QUEUE.remove().markDead();
 	}
 	
@@ -54,23 +59,23 @@ public class PuddleParticle extends SurfaceAlignedParticle
 	public void tick()
 	{
 		super.tick();
-		
+		lastScale = curScale;
 		//scale / alpha animations
 		if(age <= appearTicks)
-			scale = MathHelper.clampedLerp(0f, data.scale(), ((float)age / appearTicks));
-		else if(age >= maxAge - 60 /*&& !config.permanent*/)
+			curScale = MathHelper.clampedLerp(0f, data.scale(), ((float)age / appearTicks));
+		else if(age >= maxAge - 60 && !GoopClientConfig.INSTANCE.permanent.getValue())
 		{
-			scale = MathHelper.clampedLerp(data.scale(), data.scale() * 0.5f, (age - (maxAge - 60)) / 60f);
+			curScale = MathHelper.clampedLerp(data.scale(), data.scale() * 0.5f, (age - (maxAge - 60)) / 60f);
 			alpha = MathHelper.clampedLerp(baseAlpha, 0f, (age - (maxAge - 60)) / 60f);
 		}
 		else
 		{
 			//Rain cleaning
-			if(/*GoopClient.getConfig().rainCleaning &&*/ data.waterHandling() != WaterHandling.IGNORE &&
+			if(GoopClientConfig.INSTANCE.rainCleaning.getValue() && data.waterHandling() != WaterHandling.IGNORE &&
 					   world.isRaining() && world.isSkyVisible(new BlockPos((int)x, (int)y, (int)z)))
 			{
 				rain = rain + 1f / 100f;
-				scale = MathHelper.clampedLerp(data.scale(), data.scale() * 1.25f, rain / 10f);
+				curScale = MathHelper.clampedLerp(data.scale(), data.scale() * 1.25f, rain / 10f);
 				alpha = MathHelper.clampedLerp(baseAlpha, 0f, rain / 10f);
 				if(rain > 10f)
 					markDead();
@@ -84,7 +89,8 @@ public class PuddleParticle extends SurfaceAlignedParticle
 			HitResult hitDown = world.raycast(new RaycastContext(pos, pos.add(0f, -0.05f, 0f),
 					RaycastContext.ShapeType.VISUAL, RaycastContext.FluidHandling.NONE, ShapeContext.absent()));
 			if(!hitUp.getType().equals(HitResult.Type.MISS) && hitDown.getType().equals(HitResult.Type.MISS))
-				world.addParticleClient(new DripParticleEffect(data.color(), 0.25f, data.mature()), pos.x, pos.y, pos.z, 0, 0, 0);
+				world.addParticleClient(new DripParticleEffect(GoopClient.getColorOrCensor(data), 0.25f, data.mature()),
+						pos.x, pos.y, pos.z, 0, 0, 0);
 		}
 		//Fluid handling
 		if(world.getFluidState(new BlockPos((int)x, (int)y, (int)z)).isIn(FluidTags.LAVA))
@@ -98,12 +104,19 @@ public class PuddleParticle extends SurfaceAlignedParticle
 				case REMOVE_PARTICLE -> markDead();
 				case REPLACE_WITH_CLOUD_PARTICLE ->
 				{
-					world.addParticleClient(new DustParticleEffect(data.color(), scale), x, y, z,
+					world.addParticleClient(new DustParticleEffect(GoopClient.getColorOrCensor(data), scale), x, y, z,
 							random.nextFloat() * 0.1f, random.nextFloat() * 0.1f, random.nextFloat() * 0.1f);
 					markDead();
 				}
 			}
 		}
+	}
+	
+	@Override
+	public void render(VertexConsumer vertexConsumer, Camera camera, float delta)
+	{
+		scale = MathHelper.clampedLerp(lastScale, curScale, delta);
+		super.render(vertexConsumer, camera, delta);
 	}
 	
 	@Override

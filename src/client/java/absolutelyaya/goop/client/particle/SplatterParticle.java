@@ -1,5 +1,6 @@
 package absolutelyaya.goop.client.particle;
 
+import absolutelyaya.goop.client.GoopClient;
 import absolutelyaya.goop.particle.BaseGoopData;
 import absolutelyaya.goop.particle.PuddleParticleEffect;
 import absolutelyaya.goop.particle.SplatterParticleEffect;
@@ -42,7 +43,7 @@ public class SplatterParticle extends SpriteBillboardParticle
 		gravityStrength = 1 + scale / 2;
 		maxAge = 300;
 		collidesWithWorld = true;
-		float[] c = new Color(data.color(), true).getColorComponents(null);
+		float[] c = new Color(GoopClient.getColorOrCensor(data), true).getColorComponents(null);
 		if(c.length >= 3)
 			setColor(c[0], c[1], c[2]);
 		if(c.length >= 4)
@@ -80,7 +81,7 @@ public class SplatterParticle extends SpriteBillboardParticle
 				case REMOVE_PARTICLE -> markDead();
 				case REPLACE_WITH_CLOUD_PARTICLE ->
 				{
-					world.addParticleClient(new DustParticleEffect(data.color(), scale * 2.5f), x, y, z,
+					world.addParticleClient(new DustParticleEffect(GoopClient.getColorOrCensor(data), scale * 2.5f), x, y, z,
 							random.nextFloat() * 0.1f, random.nextFloat() * 0.1f, random.nextFloat() * 0.1f);
 					markDead();
 				}

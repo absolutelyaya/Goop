@@ -16,6 +16,9 @@
     ],
     "main": [
       "absolutelyaya.goop.Goop"
+    ],
+    "modmenu": [
+      "absolutelyaya.goop.client.ModMenu"
     ]
   },
   "mixins": [

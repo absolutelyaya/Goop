@@ -1,0 +1,16 @@
+{
+  "config.goop.GoopCap": "Goop Cap",
+  "config.goop.GoopCap.description": "The Maximum Amount of Goop Puddles that can exist at a time.",
+  "config.goop.RainCleaning": "Rain Cleaning",
+  "config.goop.RainCleaning.description": "Whether Goop Puddles should be washed away by rain.",
+  "config.goop.Permanent": "Permanent",
+  "config.goop.Permanent.description": "Whether Goop Puddles should never expire. (they will still be removed once the cap is reached)",
+  "config.goop.PuddleRotation": "Puddle Rotation",
+  "config.goop.PuddleRotation.description": "Whether Puddles should be randomly rotated.",
+  "config.goop.Fancy": "Fancy Goop",
+  "config.goop.Fancy.description": "More Elaborate Goop Rendering; Puddles deform on walls and ceilings and makes puddles dynamic.",
+  "config.goop.CensorMature": "Censor Mature",
+  "config.goop.CensorMature.description": "Whether Goop Emitters marked as mature should be replaced using a censor color.",
+  "config.goop.Debug": "Debug Rendering",
+  "config.goop.Debug.description": "[WARNING; MAY LAG A LOT] adds debug particles to goop puddles."
+}
