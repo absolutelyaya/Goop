@@ -4,6 +4,7 @@ import absolutelyaya.goop.client.config.GoopClientConfig;
 import absolutelyaya.goop.client.particle.DripParticle;
 import absolutelyaya.goop.client.particle.PuddleParticle;
 import absolutelyaya.goop.client.particle.SplatterParticle;
+import absolutelyaya.goop.client.registries.KeybindRegistry;
 import absolutelyaya.goop.particle.BaseGoopData;
 import absolutelyaya.goop.particle.ParticleEffects;
 import net.fabricmc.api.ClientModInitializer;
@@ -20,6 +21,7 @@ public class GoopClient implements ClientModInitializer
 		particleRegistry.register(ParticleEffects.DRIP, DripParticle.Factory::new);
 		
 		new GoopClientConfig();
+		KeybindRegistry.register();
 	}
 	
 	public static int getColorOrCensor(BaseGoopData data)
