@@ -12,12 +12,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.Nullable;
 
@@ -97,40 +97,29 @@ public class SplatterParticle extends SpriteBillboardParticle
 			Vec3d movement = new Vec3d(dx, dy, dz);
 			List<VoxelShape> collisions = Entity.findCollisionsForMovement(null, world, List.of(), getBoundingBox().stretch(movement));
 			if(!collisions.isEmpty())
-				processCollisions(movement, collisions);
+				processImpactSurface(movement);
 		}
 		super.move(dx, dy, dz);
 	}
 	
-	void processCollisions(Vec3d movement, List<VoxelShape> collisions)
+	void processImpactSurface(Vec3d movement)
 	{
-		Vec3d offset = Vec3d.ZERO;
-		for (Direction.Axis axis : Entity.getAxisCheckOrder(movement))
-		{
-			double axisLength = movement.getComponentAlongAxis(axis);
-			if (axisLength != 0.0)
-			{
-				double e = VoxelShapes.calculateMaxOffset(axis, getBoundingBox().offset(offset), collisions, axisLength);
-				offset = offset.withAxis(axis, e);
-			}
-		}
-		offset = offset.normalize();
 		Vec3d pos = new Vec3d(x, y, z);
-		Direction dir;
-		if(Math.abs(offset.y) > Math.abs(offset.x) && Math.abs(offset.y) > Math.abs(offset.z))
-			dir = offset.y > 0 ? Direction.UP : Direction.DOWN;
-		else if(Math.abs(offset.x) > Math.abs(offset.z))
-			dir = offset.x > 0 ? Direction.EAST : Direction.WEST;
+		HitResult hit = world.raycast(new RaycastContext(pos, pos.add(movement),
+				RaycastContext.ShapeType.VISUAL, RaycastContext.FluidHandling.NONE, ShapeContext.absent()));
+		if(!hit.getType().equals(HitResult.Type.MISS) && hit instanceof BlockHitResult bHit)
+			placePuddle(bHit.getPos().offset(bHit.getSide().getOpposite(), 0), bHit.getSide().getOpposite());
 		else
-			dir = offset.z > 0 ? Direction.SOUTH : Direction.NORTH;
-		placePuddle(pos, dir);
+			markDead();
 	}
 	
 	void placePuddle(Vec3d pos, Direction dir)
 	{
-		HitResult hit = world.raycast(new RaycastContext(pos.offset(dir.getOpposite(), 0.2), pos.offset(dir, 16), RaycastContext.ShapeType.VISUAL, RaycastContext.FluidHandling.NONE, ShapeContext.absent()));
+		HitResult hit = world.raycast(new RaycastContext(pos.offset(dir.getOpposite(), 0.2), pos.offset(dir, 16),
+				RaycastContext.ShapeType.VISUAL, RaycastContext.FluidHandling.NONE, ShapeContext.absent()));
 		Vec3d correctedHitPos = (hit.getType().equals(HitResult.Type.MISS) ? pos : hit.getPos()).offset(dir.getOpposite(), 0.005);
-		world.addParticleClient(new PuddleParticleEffect(data, dir.getOpposite()), correctedHitPos.x, correctedHitPos.y, correctedHitPos.z, 0, 0, 0);
+		world.addParticleClient(new PuddleParticleEffect(data, dir.getOpposite()),
+				correctedHitPos.x, correctedHitPos.y, correctedHitPos.z, 0, 0, 0);
 		markDead();
 	}
 	

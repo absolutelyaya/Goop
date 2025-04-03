@@ -43,7 +43,7 @@ public class PuddleParticle extends SurfaceAlignedParticle
 		alpha = Math.min(random.nextFloat() + 0.5f, 1);
 		baseAlpha = alpha;
 		scale = 0f;
-		appearTicks = random.nextInt(4) + 3;
+		appearTicks = random.nextInt(2) + 3;
 		GOOP_QUEUE.add(this);
 		if(GOOP_QUEUE.size() > GoopClientConfig.INSTANCE.goopCap.getValue())
 			GOOP_QUEUE.remove().markDead();
