@@ -15,6 +15,7 @@ public class GoopClientConfig extends ClientConfig
 	public final BooleanEntry permanent = new BooleanEntry("Permanent", false);
 	public final BooleanEntry puddleRot = new BooleanEntry("PuddleRotation", true);
 	public final BooleanEntry fancy = new BooleanEntry("Fancy", true);
+	public final BooleanEntry wrapToEdges = new BooleanEntry("WrapToEdges", false);
 	public final BooleanEntry censor = new BooleanEntry("CensorMature", false);
 	public final IntegerEntry censorColor = new IntegerEntry("CensorColor", 0xffef33ff);
 	public final BooleanEntry debug = new BooleanEntry("Debug", false);
@@ -31,6 +32,7 @@ public class GoopClientConfig extends ClientConfig
 		addEntry(permanent);
 		addEntry(puddleRot);
 		addEntry(fancy);
+		addEntry(wrapToEdges);
 		addEntry(censor);
 		addEntry(debug);
 		

@@ -12,6 +12,8 @@
   "config.goop.PuddleRotation.description": "Whether Puddles should be randomly rotated.",
   "config.goop.Fancy": "Fancy Goop",
   "config.goop.Fancy.description": "More Elaborate Goop Rendering; Puddles deform on walls and ceilings and makes puddles dynamic.",
+  "config.goop.WrapToEdges": "Wrap to Edges",
+  "config.goop.WrapToEdges.description": "Attempts to wrap floating vertices of puddles to the nearest Block Edge; This may not always have the desired result and *will* warp the textures.",
   "config.goop.CensorMature": "Censor Mature",
   "config.goop.CensorMature.description": "Whether Goop Emitters marked as mature should be replaced using a censor color.",
   "config.goop.Debug": "Debug Rendering",

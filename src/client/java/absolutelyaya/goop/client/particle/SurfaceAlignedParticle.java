@@ -153,17 +153,17 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 								vel.x, vel.y, vel.z);
 					}
 					
-					//if(config.wrapToEdges && data.scale() >= 2)
-					//{
-					//	for (int i = 0; i < faceVerts.length; i++)
-					//	{
-					//		Vec3d mv = faceVerts[i];
-					//		mv = mv.add(camPos);
-					//		if(!isValidPos(mv))
-					//			mv = moveToBlockEdge(mv);
-					//		faceVerts[i] = mv.subtract(camPos);
-					//	}
-					//}
+					if(GoopClientConfig.INSTANCE.wrapToEdges.getValue() && data.scale() >= 2)
+					{
+						for (int i = 0; i < faceVerts.length; i++)
+						{
+							Vec3d mv = faceVerts[i];
+							mv = mv.add(camPos);
+							if(!isValidPos(mv))
+								mv = moveToBlockEdge(mv);
+							faceVerts[i] = mv.subtract(camPos);
+						}
+					}
 				}
 				
 				if(render)
@@ -195,20 +195,22 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 					vertexConsumer.vertex((float)faceVerts[0].getX(), (float)faceVerts[0].getY(), (float)faceVerts[0].getZ()).
 							texture(vertices.get(vi).uv.x, vertices.get(vi).uv.y)
 							.color(this.red, this.green, this.blue, this.alpha).light(brightness);
+					
+					if(debug && age % 9 == 0)
+					{
+						//goop Vertices, colored based on UVs
+						for (Vec3d vertex : faceVerts)
+						{
+							world.addParticleClient(new DustParticleEffect(new Color(x / targetSize, y / targetSize, 0f).getRGB(), 0.5f),
+									camPos.x + vertex.getX(), camPos.y + vertex.getY() + 0.1, camPos.z + vertex.getZ(), 0, 0.05, 0);
+						}
+					}
 				}
 			}
 		}
 		
 		if(debug && age % 3 == 0)
 		{
-			//goop Vertices, colored based on UVs
-			for (int i = 0; i < verts.size(); i++)
-			{
-				Vec3d vertex = verts.get(i);
-				Vec2f uv = vertices.get(i).uv;
-				world.addParticleClient(new DustParticleEffect(new Color(uv.x, uv.y, 0f).getRGB(), 0.5f),
-						camPos.x + vertex.getX(), camPos.y + vertex.getY() + 0.1, camPos.z + vertex.getZ(), 0, 0.05, 0);
-			}
 			//goop Center
 			world.addParticleClient(new DustParticleEffect(0xffffff, 1f), this.x, this.y, this.z, 0, 0.25, 0);
 		}
@@ -247,11 +249,35 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 			deformation = (float)age / maxAge;
 	}
 	
-	//private Vec3d moveToBlockEdge(Vec3d vert)
-	//{
-	//	Vec3d dir = vert.subtract(x, y, z).normalize().multiply(0.33);
-	//	return new Vec3d(Math.round(vert.getX() - dir.x), vert.getY(), Math.round(vert.getZ() - dir.z));
-	//}
+	private Vec3d moveToBlockEdge(Vec3d vert)
+	{
+		for (Direction.Axis axis : Direction.Axis.VALUES)
+		{
+			if(axis.equals(up.getAxis()))
+				continue;
+			double floored = Math.floor(vert.getComponentAlongAxis(axis));
+			if(isValidPos(vert.withAxis(axis, floored)))
+			{
+				vert = vert.withAxis(axis, floored);
+				continue;
+			}
+			double ceiled = Math.ceil(vert.getComponentAlongAxis(axis));
+			if(isValidPos(vert.withAxis(axis, ceiled)))
+				vert = vert.withAxis(axis, ceiled);
+		}
+		if(!isValidPos(vert))
+		{
+			Vec3d tmp = new Vec3d(Math.floor(vert.x), Math.floor(vert.y), Math.floor(vert.z));
+			tmp = tmp.withAxis(up.getAxis(), vert.getComponentAlongAxis(up.getAxis()));
+			if(isValidPos(tmp))
+				return tmp;
+			tmp = new Vec3d(Math.ceil(vert.x), Math.ceil(vert.y), Math.ceil(vert.z));
+			tmp = tmp.withAxis(up.getAxis(), vert.getComponentAlongAxis(up.getAxis()));
+			if(isValidPos(tmp))
+				return tmp;
+		}
+		return vert;
+	}
 	
 	@Override
 	protected int getBrightness(float tint)
