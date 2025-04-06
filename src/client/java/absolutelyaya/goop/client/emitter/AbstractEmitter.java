@@ -1,15 +1,15 @@
 package absolutelyaya.goop.client.emitter;
 
-import absolutelyaya.goop.particle.BaseGoopData;
+import absolutelyaya.goop.data.ModularGoopData;
 
 import java.util.List;
 
 public abstract class AbstractEmitter
 {
 	final List<EntityTypeReference> targets;
-	final BaseGoopData goopData;
+	final ModularGoopData goopData;
 	
-	public AbstractEmitter(List<EntityTypeReference> targets, BaseGoopData goopData)
+	public AbstractEmitter(List<EntityTypeReference> targets, ModularGoopData goopData)
 	{
 		this.targets = targets;
 		this.goopData = goopData;

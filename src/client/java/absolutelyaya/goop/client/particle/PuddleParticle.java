@@ -2,7 +2,7 @@ package absolutelyaya.goop.client.particle;
 
 import absolutelyaya.goop.client.GoopClient;
 import absolutelyaya.goop.client.config.GoopClientConfig;
-import absolutelyaya.goop.particle.BaseGoopData;
+import absolutelyaya.goop.data.FinalGoopData;
 import absolutelyaya.goop.particle.DripParticleEffect;
 import absolutelyaya.goop.particle.PuddleParticleEffect;
 import absolutelyaya.goop.particle.WaterHandling;
@@ -37,7 +37,7 @@ public class PuddleParticle extends SurfaceAlignedParticle
 	float rain;
 	float lastScale, curScale;
 	
-	protected PuddleParticle(ClientWorld clientWorld, Vec3d pos, SpriteProvider spriteProvider, BaseGoopData data, Direction up)
+	protected PuddleParticle(ClientWorld clientWorld, Vec3d pos, SpriteProvider spriteProvider, FinalGoopData data, Direction up)
 	{
 		super(clientWorld, pos, spriteProvider, data, up);
 		alpha = Math.min(random.nextFloat() + 0.5f, 1);

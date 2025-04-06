@@ -2,7 +2,7 @@ package absolutelyaya.goop.client.particle;
 
 import absolutelyaya.goop.client.GoopClient;
 import absolutelyaya.goop.client.config.GoopClientConfig;
-import absolutelyaya.goop.particle.BaseGoopData;
+import absolutelyaya.goop.data.FinalGoopData;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.client.MinecraftClient;
@@ -25,12 +25,12 @@ import java.util.List;
 public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 {
 	protected final SpriteProvider spriteProvider;
-	final BaseGoopData data;
+	final FinalGoopData data;
 	final Direction up;
 	final List<Vertex> vertices;
 	protected float deformation;
 	
-	protected SurfaceAlignedParticle(ClientWorld clientWorld, Vec3d pos, SpriteProvider spriteProvider, BaseGoopData data, Direction up)
+	protected SurfaceAlignedParticle(ClientWorld clientWorld, Vec3d pos, SpriteProvider spriteProvider, FinalGoopData data, Direction up)
 	{
 		super(clientWorld, pos.x, pos.y, pos.z);
 		this.maxAge = GoopClientConfig.INSTANCE.permanent.getValue() ? Integer.MAX_VALUE : 200 + random.nextInt(100);
@@ -110,6 +110,8 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 		{
 			for (int x = 1; x < (int)targetSize + 1; x++, vi++)
 			{
+				if(vi + targetSize + 2 >= verts.size())
+					continue;
 				Vec3d[] faceVerts = new Vec3d[] {
 						verts.get(vi),
 						verts.get((int)(vi + targetSize + 1)),
@@ -136,7 +138,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 					}
 					
 					//deformation
-					if(data.deforms() && !(up.equals(Direction.UP)))
+					if(data.deform() && !(up.equals(Direction.UP)))
 					{
 						faceVerts[0] = faceVerts[0].subtract(new Vec3d(0, deformation * vertices.get(vi).maxDeform, 0));
 						faceVerts[1] = faceVerts[1].subtract(new Vec3d(0, deformation * vertices.get((int)(vi + targetSize + 1)).maxDeform, 0));
@@ -245,7 +247,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 		super.tick();
 		if(!isValidPos(new Vec3d(x, y, z)))
 			markDead();
-		if(data.deforms())
+		if(data.deform())
 			deformation = (float)age / maxAge;
 	}
 	

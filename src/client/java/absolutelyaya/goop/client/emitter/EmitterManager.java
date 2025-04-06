@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageType;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.resource.JsonDataLoader;
@@ -59,7 +60,7 @@ public class EmitterManager extends JsonDataLoader<AbstractEmitter> implements S
 				continue;
 			if(!(i instanceof DamageEmitter emitter))
 				continue;
-			if(!matchesAnyDamageType(emitter.damageTypes, damageType))
+			if(damageType.equals(DamageTypes.GENERIC_KILL) || !matchesAnyDamageType(emitter.damageTypes, damageType))
 				continue;
 			emitter.emit(entity, amount);
 		}

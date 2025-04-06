@@ -2,7 +2,7 @@
   "type": "DAMAGE",
   "goop": {
     "color": 11473152,
-    "scale": 1,
+    "size": "damage/2",
     "waterhandling": "REPLACE_WITH_CLOUD_PARTICLE"
   }
 }

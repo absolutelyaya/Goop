@@ -1,7 +1,7 @@
 package absolutelyaya.goop.client.particle;
 
 import absolutelyaya.goop.client.GoopClient;
-import absolutelyaya.goop.particle.BaseGoopData;
+import absolutelyaya.goop.data.FinalGoopData;
 import absolutelyaya.goop.particle.PuddleParticleEffect;
 import absolutelyaya.goop.particle.SplatterParticleEffect;
 import absolutelyaya.goop.particle.WaterHandling;
@@ -27,11 +27,11 @@ import java.util.List;
 public class SplatterParticle extends SpriteBillboardParticle
 {
 	protected final SpriteProvider spriteProvider;
-	final BaseGoopData data;
+	final FinalGoopData data;
 	final float rotSpeed;
 	final Identifier effectOverride;
 	
-	protected SplatterParticle(ClientWorld clientWorld, Vec3d pos, Vec3d vel, SpriteProvider provider, BaseGoopData data, Identifier effectOverride)
+	protected SplatterParticle(ClientWorld clientWorld, Vec3d pos, Vec3d vel, SpriteProvider provider, FinalGoopData data, Identifier effectOverride)
 	{
 		super(clientWorld, pos.x, pos.y, pos.z);
 		spriteProvider = provider;

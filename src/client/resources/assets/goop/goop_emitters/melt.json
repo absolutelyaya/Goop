@@ -10,7 +10,7 @@
       0.9,
       1
     ],
-    "scale": 1.5,
+    "size": 1.5,
     "waterhandling": "REMOVE_PARTICLE"
   }
 }
