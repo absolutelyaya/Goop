@@ -36,7 +36,7 @@ public class SplatterParticle extends SpriteBillboardParticle
 		super(clientWorld, pos.x, pos.y, pos.z);
 		spriteProvider = provider;
 		this.data = data;
-		this.scale = data.scale() - (data.scale() > 1f ? 1.25f * (data.scale() / 2f) : 0f);
+		this.scale = data.scale() - 1.25f * (data.scale() / 2f);
 		this.rotSpeed = (random.nextFloat() - 0.5f) / 4f / scale;
 		this.effectOverride = effectOverride;
 		sprite = spriteProvider.getSprite(random);

@@ -1,11 +1,14 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "absolutelyaya.goop.mixin.client",
+  "package": "absolutelyaya.goop.client.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "mixins": [
+    "LivingEntityMixin"
+  ]
 }

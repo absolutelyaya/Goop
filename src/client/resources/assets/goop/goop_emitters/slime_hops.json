@@ -1,0 +1,16 @@
+{
+  "type": "LANDING",
+  "targets": [
+    "minecraft:slime"
+  ],
+  "goop": {
+    "color": [
+      0.2,
+      0.74,
+      0.47,
+      1
+    ],
+    "scale": 1,
+    "waterhandling": "REPLACE_WITH_CLOUD_PARTICLE"
+  }
+}
