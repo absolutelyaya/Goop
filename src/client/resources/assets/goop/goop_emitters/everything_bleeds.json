@@ -2,7 +2,8 @@
   "type": "DAMAGE",
   "goop": {
     "color": 11473152,
-    "size": "damage/2",
+    "size": "min(1 + damage / 2 + rand(0.5), 4)",
     "waterhandling": "REPLACE_WITH_CLOUD_PARTICLE"
-  }
+  },
+  "count": "clamp((damage * 2) + (min(2, 1) * (2 - 1)), 1, 32)"
 }

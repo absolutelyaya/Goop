@@ -1,5 +1,6 @@
 package absolutelyaya.goop.client.emitter;
 
+import absolutelyaya.goop.data.Calculatable;
 import absolutelyaya.goop.data.ModularGoopData;
 import absolutelyaya.goop.particle.SplatterParticleEffect;
 import com.mojang.serialization.MapCodec;
@@ -17,13 +18,15 @@ public class DeathEmitter extends AbstractEmitter
 	public static final MapCodec<DeathEmitter> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
 			EntityTypeReference.CODEC.listOf().optionalFieldOf("targets", List.of()).forGetter(emitter -> emitter.targets),
 			ModularGoopData.CODEC.fieldOf("goop").forGetter(emitter -> emitter.goopData),
-			DamageTypeReference.CODEC.listOf().optionalFieldOf("damage-types", List.of()).forGetter(emitter -> emitter.damageTypes)
+			DamageTypeReference.CODEC.listOf().optionalFieldOf("damage-types", List.of()).forGetter(emitter -> emitter.damageTypes),
+			Calculatable.CODEC.optionalFieldOf("count", new Calculatable("rand(4, 8)")).forGetter(emitter -> emitter.count),
+			Calculatable.CODEC.optionalFieldOf("speed", new Calculatable("0")).forGetter(emitter -> emitter.speed)
 	).apply(instance, DeathEmitter::new));
 	List<DamageTypeReference> damageTypes;
 	
-	public DeathEmitter(List<EntityTypeReference> targets, ModularGoopData goopData, List<DamageTypeReference> damageTypes)
+	public DeathEmitter(List<EntityTypeReference> targets, ModularGoopData goopData, List<DamageTypeReference> damageTypes, Calculatable count, Calculatable speed)
 	{
-		super(targets, goopData);
+		super(targets, goopData, count, speed);
 		this.damageTypes = damageTypes;
 	}
 	
@@ -36,12 +39,14 @@ public class DeathEmitter extends AbstractEmitter
 	public void emit(LivingEntity entity)
 	{
 		Random rand = entity.getRandom();
-		for (int i = 0; i < 8; i++)
+		Map<String, Float> vars = Map.of();
+		for (int i = 0; i < count.calculate(vars); i++)
 		{
 			Vec3d pos = entity.getPos().add(new Vec3d(0, 0, 0).addRandom(rand, entity.getWidth()).multiply(1, 0, 1)
 													.add(0, rand.nextFloat() * entity.getHeight(), 0));
-			entity.getWorld().addParticleClient(new SplatterParticleEffect(goopData.calculate(Map.of()), Optional.empty()),
-					pos.getX(), pos.getY(), pos.getZ(), 0, 0, 0);
+			Vec3d vel = new Vec3d(0, 0, 0).addRandom(rand, speed.calculate(vars));
+			entity.getWorld().addParticleClient(new SplatterParticleEffect(goopData.calculate(vars), Optional.empty()),
+					pos.x, pos.y, pos.z, vel.x, vel.y, vel.z);
 		}
 	}
 }

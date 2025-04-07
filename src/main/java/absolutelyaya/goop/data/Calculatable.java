@@ -9,6 +9,8 @@ import org.joml.Vector2f;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,9 +21,11 @@ public record Calculatable(String formula)
 	
 	public float calculate(Map<String, Float> vars)
 	{
-		String curFormula = formula;
+		String curFormula = formula.replace(" ", "");
 		for (Map.Entry<String, Float> var : vars.entrySet())
 			curFormula = curFormula.replace(var.getKey(), var.getValue().toString());
+		curFormula = Func.resolveFunctions(curFormula);
+		curFormula = resolveBrackets(curFormula);
 		final Pattern pattern = Pattern.compile("[A-Za-z]+");
 		final Matcher matcher = pattern.matcher(curFormula);
 		while(matcher.find())
@@ -29,15 +33,26 @@ public record Calculatable(String formula)
 		return eval(curFormula);
 	}
 	
+	String resolveBrackets(String equation)
+	{
+		Stack<Integer> open = new Stack<>();
+		for (int i = 0; i < equation.length(); i++)
+		{
+			if(equation.charAt(i) == '(')
+				open.push(i + 1);
+			else if(!open.isEmpty() && equation.charAt(i) == ')')
+			{
+				String content = equation.substring(open.peek(), i);
+				String resolved = resolveBrackets(content);
+				equation = equation.replace("(" + content + ")", resolved);
+				i = open.pop();
+			}
+		}
+		return equation;
+	}
+	
 	float eval(String equation)
 	{
-		final Pattern bracketPattern = Pattern.compile("\\((.*?)\\)", Pattern.CASE_INSENSITIVE);
-		final Matcher bracketMatcher = bracketPattern.matcher(equation);
-		while(bracketMatcher.find())
-		{
-			String i = bracketMatcher.group();
-			equation = equation.replace(i, String.valueOf(eval(i.replace("(", "").replace(")", ""))));
-		}
 		while(true)
 		{
 			String[] segments =  equation.split("((?=[+\\-/*])|(?<=[+\\-/*]))");
@@ -80,6 +95,8 @@ public record Calculatable(String formula)
 				return result;
 			}
 		}
+		if(equation.isEmpty())
+			return 0f;
 		return Float.parseFloat(equation);
 	}
 	
@@ -117,6 +134,77 @@ public record Calculatable(String formula)
 		public int getColor(Map<String, Float> vars)
 		{
 			return new java.awt.Color(r.calculate(vars), g.calculate(vars), b.calculate(vars), a.calculate(vars)).getRGB();
+		}
+	}
+	
+	public record Func(String id, Function<Float[], Float> processor)
+	{
+		static final Random rand = Random.create();
+		
+		static final Func MAX = new Func("max", i -> Math.max(i[0], i[1]));
+		static final Func MIN = new Func("min", i -> Math.min(i[0], i[1]));
+		static final Func CLAMP = new Func("clamp", i -> Math.clamp(i[0], i[1], i[2]));
+		static final Func RANDOM_FLOAT = new Func("rand", i -> {
+			if(i.length >= 2)
+				return i[0] + rand.nextFloat() * (i[1] - i[0]);
+			else if(i.length == 1)
+				return rand.nextFloat() * i[0];
+			else
+				return rand.nextFloat();
+		});
+		static final Func RANDOM_BOOL = new Func("randb", i -> {
+			if(i.length > 0)
+				return rand.nextFloat() > i[0] ? 1f : 0f;
+			else
+				return rand.nextFloat() > 0.5 ? 1f : 0f;
+		});
+		static final Func POWER = new Func("pow", i -> (float)Math.pow(i[0], i[1]));
+		
+		public static final Func[] ALL_FUNCS = new Func[] {MAX, MIN, CLAMP, RANDOM_FLOAT, RANDOM_BOOL, POWER};
+		
+		public static String resolveFunctions(String formula)
+		{
+			for (Func f : ALL_FUNCS)
+				formula = resolveFunc(f, formula);
+			return formula;
+		}
+		
+		static String resolveFunc(Func func, String formula)
+		{
+			String prefix = func.id + "(";
+			String processing = formula;
+			while(!processing.isEmpty())
+			{
+				if(!processing.startsWith(prefix))
+				{
+					processing = processing.substring(1);
+					continue;
+				}
+				int depth = 1;
+				String content = processing.substring(prefix.length());
+				for (int i = 0; i < content.length(); i++)
+				{
+					if(content.charAt(i) == '(')
+						depth++;
+					else if(content.charAt(i) == ')')
+					{
+						if(--depth <= 0)
+						{
+							content = content.substring(0, i);
+							break;
+						}
+					}
+				}
+				String[] args = content.split(",");
+				if(args.length == 1 && args[0].isEmpty())
+					args = new String[0];
+				Float[] processedArgs = new Float[args.length];
+				for (int i = 0; i < args.length; i++)
+					processedArgs[i] = new Calculatable(args[i]).calculate(Map.of());
+				formula = formula.replace(prefix + content + ")", String.valueOf(func.processor.apply(processedArgs)));
+				processing = processing.substring(prefix.length() + content.length() + 1);
+			}
+			return formula;
 		}
 	}
 }
