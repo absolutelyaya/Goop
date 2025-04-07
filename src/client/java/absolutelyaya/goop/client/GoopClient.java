@@ -11,11 +11,15 @@ import absolutelyaya.goop.client.registries.KeybindRegistry;
 import absolutelyaya.goop.data.FinalGoopData;
 import absolutelyaya.goop.particle.ParticleEffects;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
+import net.minecraft.text.Text;
 
 public class GoopClient implements ClientModInitializer
 {
+	int serverCheckTimer;
+	
 	@Override
 	public void onInitializeClient()
 	{
@@ -33,6 +37,17 @@ public class GoopClient implements ClientModInitializer
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
 			PuddleParticle.removeAll(); //it'd be rude to leave a mess behind
 			Goop.CLIENT_ONLY = true;
+		});
+		
+		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+			serverCheckTimer = 100;
+		});
+		ClientTickEvents.END_CLIENT_TICK.register((client) -> {
+			if(serverCheckTimer-- == 0 && Goop.CLIENT_ONLY)
+			{
+				if(client.player != null)
+					client.player.sendMessage(Text.translatable("message.goop.client_only_notice"), false);
+			}
 		});
 	}
 	

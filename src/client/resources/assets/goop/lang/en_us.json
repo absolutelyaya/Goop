@@ -1,4 +1,6 @@
 {
+  "message.goop.client_only_notice": "§7[§3GOOP§7] It looks like this Server doesn't support Goop...\n         Emitters will not work to their fullest potential.",
+
   "category.goop": "Goop",
   "key.goop.clear": "Clear All Puddles",
 
