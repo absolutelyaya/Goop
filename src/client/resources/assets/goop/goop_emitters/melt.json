@@ -12,5 +12,6 @@
     ],
     "size": 1.5,
     "waterhandling": "REMOVE_PARTICLE"
-  }
+  },
+  "count": 0
 }

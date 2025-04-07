@@ -2,12 +2,16 @@ package absolutelyaya.goop.client.emitter;
 
 import absolutelyaya.goop.data.Calculatable;
 import absolutelyaya.goop.data.ModularGoopData;
+import absolutelyaya.goop.particle.PuddleParticleEffect;
 import absolutelyaya.goop.particle.SplatterParticleEffect;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.world.RaycastContext;
 
 import java.util.List;
 import java.util.Map;
@@ -41,6 +45,16 @@ public class DamageEmitter extends AbstractEmitter
 	{
 		Random rand = entity.getRandom();
 		Map<String, Float> vars = Map.of("damage", Math.min(amount, entity.getHealth()));
+		float ccount = count.calculate(vars);
+		if(ccount < 1)
+		{
+			HitResult hit = entity.getWorld().raycast(new RaycastContext(entity.getPos(), entity.getPos().add(0, -1, 0),
+					RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity));
+			Vec3d hitPos = hit.getPos();
+			entity.getWorld().addParticleClient(new PuddleParticleEffect(goopData.calculate(vars), Direction.UP),
+					hitPos.getX(), hitPos.getY(), hitPos.getZ(), 0, 0, 0);
+			return;
+		}
 		for (int i = 0; i < count.calculate(vars); i++)
 		{
 			Vec3d pos = entity.getPos().add(new Vec3d(0, 0, 0).addRandom(rand, entity.getWidth()).multiply(1, 0, 1)

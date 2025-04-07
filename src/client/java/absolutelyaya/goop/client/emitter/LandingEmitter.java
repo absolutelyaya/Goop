@@ -40,13 +40,13 @@ public class LandingEmitter extends AbstractEmitter
 	public void emit(LivingEntity entity, float amount)
 	{
 		Random rand = entity.getRandom();
-		HitResult hit = entity.getWorld().raycast(new RaycastContext(entity.getPos(), entity.getPos().add(0, -1, 0),
-				RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity));
-		Vec3d hitPos = hit.getPos();
 		Map<String, Float> vars = Map.of("fallDist", amount);
 		float ccount = count.calculate(vars);
 		if(ccount < 1)
 		{
+			HitResult hit = entity.getWorld().raycast(new RaycastContext(entity.getPos(), entity.getPos().add(0, -1, 0),
+					RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity));
+			Vec3d hitPos = hit.getPos();
 			entity.getWorld().addParticleClient(new PuddleParticleEffect(goopData.calculate(vars), Direction.UP),
 					hitPos.getX(), hitPos.getY(), hitPos.getZ(), 0, 0, 0);
 			return;
