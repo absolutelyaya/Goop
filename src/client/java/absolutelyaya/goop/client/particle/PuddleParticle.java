@@ -88,7 +88,7 @@ public class PuddleParticle extends SurfaceAlignedParticle
 			HitResult hitDown = world.raycast(new RaycastContext(pos, pos.add(0f, -0.05f, 0f),
 					RaycastContext.ShapeType.VISUAL, RaycastContext.FluidHandling.NONE, ShapeContext.absent()));
 			if(!hitUp.getType().equals(HitResult.Type.MISS) && hitDown.getType().equals(HitResult.Type.MISS))
-				world.addParticleClient(new DripParticleEffect(GoopClient.getColorOrCensor(data), 0.25f, data.mature()),
+				world.addParticle(new DripParticleEffect(GoopClient.getColorOrCensor(data), 0.25f, data.mature()),
 						pos.x, pos.y, pos.z, 0, 0, 0);
 		}
 		//Fluid handling
@@ -103,7 +103,7 @@ public class PuddleParticle extends SurfaceAlignedParticle
 				case REMOVE_PARTICLE -> markDead();
 				case REPLACE_WITH_CLOUD_PARTICLE ->
 				{
-					world.addParticleClient(new DustParticleEffect(GoopClient.getColorOrCensor(data), scale), x, y, z,
+					world.addParticle(new DustParticleEffect(GoopClient.getColorOrCensorVec(data), scale), x, y, z,
 							random.nextFloat() * 0.1f, random.nextFloat() * 0.1f, random.nextFloat() * 0.1f);
 					markDead();
 				}
@@ -112,10 +112,10 @@ public class PuddleParticle extends SurfaceAlignedParticle
 	}
 	
 	@Override
-	public void render(VertexConsumer vertexConsumer, Camera camera, float delta)
+	public void buildGeometry(VertexConsumer vertexConsumer, Camera camera, float delta)
 	{
 		scale = MathHelper.clampedLerp(lastScale, curScale, delta);
-		super.render(vertexConsumer, camera, delta);
+		super.buildGeometry(vertexConsumer, camera, delta);
 	}
 	
 	@Override

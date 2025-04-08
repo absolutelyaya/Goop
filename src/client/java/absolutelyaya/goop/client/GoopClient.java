@@ -19,7 +19,9 @@ import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.text.Text;
+import org.joml.Vector3f;
 
+import java.awt.*;
 import java.util.Optional;
 
 public class GoopClient implements ClientModInitializer
@@ -75,5 +77,11 @@ public class GoopClient implements ClientModInitializer
 		if(mature && GoopClientConfig.INSTANCE.censor.getValue())
 			return GoopClientConfig.INSTANCE.censorColor.getValue();
 		return color;
+	}
+	
+	public static Vector3f getColorOrCensorVec(FinalGoopData data)
+	{
+		float[] c = new Color(getColorOrCensor(data)).getColorComponents(new float[4]);
+		return new Vector3f(c[0], c[1], c[2]);
 	}
 }

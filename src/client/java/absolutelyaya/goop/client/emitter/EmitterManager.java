@@ -2,54 +2,86 @@ package absolutelyaya.goop.client.emitter;
 
 import absolutelyaya.goop.Goop;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.JsonOps;
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageType;
 import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.resource.JsonDataLoader;
-import net.minecraft.resource.ResourceFinder;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.ResourceType;
+import net.minecraft.resource.*;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.profiler.Profiler;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-public class EmitterManager extends JsonDataLoader<AbstractEmitter> implements SimpleSynchronousResourceReloadListener
+public class EmitterManager extends SinglePreparationResourceReloader<Map<Identifier, AbstractEmitter>> implements IdentifiableResourceReloadListener
 {
+	private final DynamicOps<JsonElement> ops;
+	private final ResourceFinder finder;
+	
 	static Map<Identifier, AbstractEmitter> emittersById = Map.of();
 	static Multimap<EmitterType, AbstractEmitter> emittersByType = ArrayListMultimap.create();
 	
 	public EmitterManager()
 	{
-		super(EmitterType.CODEC, ResourceFinder.json("goop_emitters"));
+		super();
+		ops = JsonOps.INSTANCE;
+		finder = ResourceFinder.json("goop_emitters");
 		ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(this);
+	}
+	
+	@Override
+	protected Map<Identifier, AbstractEmitter> prepare(ResourceManager manager, Profiler profiler)
+	{
+		ImmutableMap.Builder<Identifier, AbstractEmitter> map = ImmutableMap.builder();
+		
+		for (Map.Entry<Identifier, Resource> entry : finder.findResources(manager).entrySet())
+		{
+			Identifier key = entry.getKey();
+			Identifier resourceId = finder.toResourceId(key);
+			
+			try (Reader reader = entry.getValue().getReader())
+			{
+				EmitterType.CODEC.parse(ops, JsonParser.parseReader(reader))
+						.ifSuccess((value) -> map.put(resourceId, value))
+						.ifError((error) -> Goop.LOGGER.error("Couldn't parse data file '{}' from '{}': {}",
+								resourceId, key, error));
+			}
+			catch (IllegalArgumentException | IOException | JsonParseException e)
+			{
+				Goop.LOGGER.error("Couldn't parse data file '{}' from '{}'", resourceId, key, e);
+			}
+		}
+		return map.build();
+	}
+	
+	@Override
+	protected void apply(Map<Identifier, AbstractEmitter> prepared, ResourceManager manager, Profiler profiler)
+	{
+		
+		emittersById = prepared;
+		emittersByType = ArrayListMultimap.create();
+		for (AbstractEmitter emitter : prepared.values())
+			emittersByType.put(emitter.getType(), emitter);
 	}
 	
 	@Override
 	public Identifier getFabricId()
 	{
 		return Goop.id("goop_emitters");
-	}
-	
-	@Override
-	public void reload(ResourceManager manager)
-	{
-		apply(prepare(manager, null), manager, null);
-	}
-	
-	@Override
-	protected void apply(Map<Identifier, AbstractEmitter> prepared, ResourceManager manager, Profiler profiler)
-	{
-		emittersById = prepared;
-		emittersByType = ArrayListMultimap.create();
-		for (AbstractEmitter emitter : prepared.values())
-			emittersByType.put(emitter.getType(), emitter);
 	}
 	
 	public static void onDamage(LivingEntity entity, RegistryEntry<DamageType> damageType, float amount)
@@ -60,7 +92,8 @@ public class EmitterManager extends JsonDataLoader<AbstractEmitter> implements S
 				continue;
 			if(!(i instanceof DamageEmitter emitter))
 				continue;
-			if(damageType.equals(DamageTypes.GENERIC_KILL) || !matchesAnyDamageType(emitter.damageTypes, damageType))
+			Optional<RegistryKey<DamageType>> damageTypeKey = damageType.getKey();
+			if((damageTypeKey.isPresent() && damageTypeKey.get().equals(DamageTypes.GENERIC_KILL)) || !matchesAnyDamageType(emitter.damageTypes, damageType))
 				continue;
 			emitter.emit(entity, amount);
 		}

@@ -68,7 +68,7 @@ public class SplatterParticle extends SpriteBillboardParticle
 	public void tick()
 	{
 		super.tick();
-		lastAngle = angle;
+		prevAngle = angle;
 		angle += rotSpeed;
 		if(world.getFluidState(new BlockPos((int)x, (int)y, (int)z)).isIn(FluidTags.LAVA))
 			markDead();
@@ -81,7 +81,7 @@ public class SplatterParticle extends SpriteBillboardParticle
 				case REMOVE_PARTICLE -> markDead();
 				case REPLACE_WITH_CLOUD_PARTICLE ->
 				{
-					world.addParticleClient(new DustParticleEffect(GoopClient.getColorOrCensor(data), scale * 2.5f), x, y, z,
+					world.addParticle(new DustParticleEffect(GoopClient.getColorOrCensorVec(data), scale * 2.5f), x, y, z,
 							random.nextFloat() * 0.1f, random.nextFloat() * 0.1f, random.nextFloat() * 0.1f);
 					markDead();
 				}
@@ -118,7 +118,7 @@ public class SplatterParticle extends SpriteBillboardParticle
 		HitResult hit = world.raycast(new RaycastContext(pos.offset(dir.getOpposite(), 0.2), pos.offset(dir, 16),
 				RaycastContext.ShapeType.VISUAL, RaycastContext.FluidHandling.NONE, ShapeContext.absent()));
 		Vec3d correctedHitPos = (hit.getType().equals(HitResult.Type.MISS) ? pos : hit.getPos()).offset(dir.getOpposite(), 0.005);
-		world.addParticleClient(new PuddleParticleEffect(data, dir.getOpposite()),
+		world.addParticle(new PuddleParticleEffect(data, dir.getOpposite()),
 				correctedHitPos.x, correctedHitPos.y, correctedHitPos.z, 0, 0, 0);
 		markDead();
 	}

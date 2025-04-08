@@ -17,6 +17,7 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
+import org.joml.Vector3f;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 					float x = up.getOffsetX(), z = up.getOffsetZ();
 					vert = new Vec3d(z * vx / subdivisions, vy / subdivisions, x * vx / subdivisions);
 				}
-				vert = vert.add(up.getDoubleVector().multiply(random.nextFloat() / 50f)); //fight Z-Fighting
+				vert = vert.add(new Vec3d(up.getUnitVector()).multiply(random.nextFloat() / 50f)); //fight Z-Fighting
 				Vec2f uv = new Vec2f(MathHelper.lerp(vx / subdivisions, getMinU(), getMaxU()), MathHelper.lerp(vy / subdivisions, getMinV(), getMaxV()));
 				
 				float maxDeform;
@@ -77,7 +78,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 	}
 	
 	@Override
-	public void render(VertexConsumer vertexConsumer, Camera camera, float delta)
+	public void buildGeometry(VertexConsumer vertexConsumer, Camera camera, float delta)
 	{
 		boolean debug = GoopClientConfig.INSTANCE.debug.getValue() && !MinecraftClient.getInstance().isPaused();
 		if(vertices.isEmpty())
@@ -85,9 +86,9 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 		boolean fancy = isFancy();
 		
 		Vec3d camPos = camera.getPos();
-		float dx = (float)(MathHelper.lerp(delta, this.lastX, this.x) - camPos.getX());
-		float dy = (float)(MathHelper.lerp(delta, this.lastY, this.y) - camPos.getY());
-		float dz = (float)(MathHelper.lerp(delta, this.lastZ, this.z) - camPos.getZ());
+		float dx = (float)(MathHelper.lerp(delta, this.prevPosX, this.x) - camPos.getX());
+		float dy = (float)(MathHelper.lerp(delta, this.prevPosY, this.y) - camPos.getY());
+		float dz = (float)(MathHelper.lerp(delta, this.prevPosZ, this.z) - camPos.getZ());
 		
 		List<Vec3d> verts = new ArrayList<>();
 		this.vertices.forEach(i ->
@@ -149,8 +150,8 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 					if(debug && age % 10 == 0)
 					{
 						//face normal, emitted from center
-						Vec3d vel = up.getDoubleVector().multiply(0.05f);
-						world.addParticleClient(ParticleTypes.FLAME,
+						Vec3d vel = new Vec3d(up.getUnitVector()).multiply(0.05f);
+						world.addParticle(ParticleTypes.FLAME,
 								camPos.x + faceCenter.getX(), camPos.y + faceCenter.getY() + 0.1, camPos.z + faceCenter.getZ(),
 								vel.x, vel.y, vel.z);
 					}
@@ -203,7 +204,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 						//goop Vertices, colored based on UVs
 						for (Vec3d vertex : faceVerts)
 						{
-							world.addParticleClient(new DustParticleEffect(new Color(x / targetSize, y / targetSize, 0f).getRGB(), 0.5f),
+							world.addParticle(new DustParticleEffect(new Vector3f(x / targetSize, y / targetSize, 0f), 0.5f),
 									camPos.x + vertex.getX(), camPos.y + vertex.getY() + 0.1, camPos.z + vertex.getZ(), 0, 0.05, 0);
 						}
 					}
@@ -214,7 +215,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 		if(debug && age % 3 == 0)
 		{
 			//goop Center
-			world.addParticleClient(new DustParticleEffect(0xffffff, 1f), this.x, this.y, this.z, 0, 0.25, 0);
+			world.addParticle(new DustParticleEffect(new Vector3f(1f, 1f, 1f), 1f), this.x, this.y, this.z, 0, 0.25, 0);
 		}
 	}
 	

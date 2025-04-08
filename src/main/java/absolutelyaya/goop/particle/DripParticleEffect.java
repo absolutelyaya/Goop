@@ -22,7 +22,7 @@ public record DripParticleEffect(int color, float scale, boolean mature) impleme
 	public static final PacketCodec<RegistryByteBuf, DripParticleEffect> PACKET_CODEC = PacketCodec.tuple(
 			PacketCodecs.INTEGER, DripParticleEffect::color,
 			PacketCodecs.FLOAT, DripParticleEffect::scale,
-			PacketCodecs.BOOLEAN, DripParticleEffect::mature,
+			PacketCodecs.codec(PrimitiveCodec.BOOL), DripParticleEffect::mature,
 			DripParticleEffect::new
 	);
 	

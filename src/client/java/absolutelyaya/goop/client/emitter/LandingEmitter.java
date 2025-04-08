@@ -48,7 +48,7 @@ public class LandingEmitter extends AbstractEmitter
 			HitResult hit = entity.getWorld().raycast(new RaycastContext(entity.getPos().add(0f, 0.5f, 0f), entity.getPos().add(0, -amount, 0),
 					RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity));
 			Vec3d hitPos = hit.getPos();
-			entity.getWorld().addParticleClient(new PuddleParticleEffect(goopData.calculate(vars), Direction.UP),
+			entity.getWorld().addParticle(new PuddleParticleEffect(goopData.calculate(vars), Direction.UP),
 					hitPos.getX(), hitPos.getY() + 0.01f, hitPos.getZ(), 0, 0, 0);
 			return;
 		}
@@ -56,7 +56,7 @@ public class LandingEmitter extends AbstractEmitter
 		{
 			Vec3d pos = entity.getPos();
 			Vec3d vel = new Vec3d(0, 0, 0).addRandom(rand, speed.calculate(vars));
-			entity.getWorld().addParticleClient(new SplatterParticleEffect(goopData.calculate(vars), Optional.empty()),
+			entity.getWorld().addParticle(new SplatterParticleEffect(goopData.calculate(vars), Optional.empty()),
 					pos.x, pos.y, pos.z, vel.x, vel.y, vel.z);
 		}
 	}
