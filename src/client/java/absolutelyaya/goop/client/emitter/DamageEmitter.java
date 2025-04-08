@@ -44,15 +44,15 @@ public class DamageEmitter extends AbstractEmitter
 	public void emit(LivingEntity entity, float amount)
 	{
 		Random rand = entity.getRandom();
-		Map<String, Float> vars = Map.of("damage", Math.min(amount, entity.getHealth()));
+		Map<String, Float> vars = Map.of("damage", Math.min(amount, entity.getMaxHealth()));
 		float ccount = count.calculate(vars);
 		if(ccount < 1)
 		{
-			HitResult hit = entity.getWorld().raycast(new RaycastContext(entity.getPos(), entity.getPos().add(0, -1, 0),
+			HitResult hit = entity.getWorld().raycast(new RaycastContext(entity.getPos().add(0f, 0.5f, 0f), entity.getPos().add(0, -1, 0),
 					RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity));
 			Vec3d hitPos = hit.getPos();
 			entity.getWorld().addParticleClient(new PuddleParticleEffect(goopData.calculate(vars), Direction.UP),
-					hitPos.getX(), hitPos.getY(), hitPos.getZ(), 0, 0, 0);
+					hitPos.getX(), hitPos.getY() + 0.01, hitPos.getZ(), 0, 0, 0);
 			return;
 		}
 		for (int i = 0; i < count.calculate(vars); i++)

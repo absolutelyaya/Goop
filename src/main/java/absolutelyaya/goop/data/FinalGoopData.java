@@ -13,7 +13,7 @@ public record FinalGoopData(int color, float scale, boolean mature, WaterHandlin
 {
 	public static final MapCodec<FinalGoopData> CODEC = RecordCodecBuilder.mapCodec(
 			instance -> instance.group(
-					Codecs.ARGB.fieldOf("color").forGetter(FinalGoopData::color),
+					Codec.INT.fieldOf("color").forGetter(FinalGoopData::color),
 					Codecs.POSITIVE_FLOAT.fieldOf("scale").forGetter(FinalGoopData::scale),
 					Codec.BOOL.optionalFieldOf("mature", false).forGetter(FinalGoopData::mature),
 					WaterHandling.CODEC.optionalFieldOf("waterhandling", WaterHandling.REPLACE_WITH_CLOUD_PARTICLE).forGetter(FinalGoopData::waterHandling),

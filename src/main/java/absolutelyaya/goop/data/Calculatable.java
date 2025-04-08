@@ -126,8 +126,8 @@ public record Calculatable(String formula)
 		
 		static DataResult<Color> map(List<Calculatable> list)
 		{
-			if(list.size() == 3 || list.size() == 4)
-				return DataResult.success(new Color(list.get(0), list.get(1), list.get(2), list.size() == 4 ? list.get(3) : new Calculatable("1")));
+			if(list.size() >= 3)
+				return DataResult.success(new Color(list.get(0), list.get(1), list.get(2), list.size() >= 4 ? list.get(3) : new Calculatable("1")));
 			return DataResult.error(() -> "Input is not a List of 3 or 4 Elements.");
 		}
 		

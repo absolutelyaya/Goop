@@ -4,7 +4,6 @@ import absolutelyaya.goop.network.EntityDamagePayload;
 import absolutelyaya.goop.network.EntityDeathPayload;
 import absolutelyaya.goop.network.EntityLandPayload;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -13,7 +12,6 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.TypeFilter;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -45,13 +43,11 @@ public abstract class LivingEntityMixin extends Entity
 				new EntityDamagePayload(getId(), RegistryEntry.of(source.getType()), amount)));
 	}
 	
-	@Inject(method = "fall", at = @At("TAIL"))
-	void onLanded(double heightDifference, boolean onGround, BlockState state, BlockPos landedPosition, CallbackInfo ci)
+	@Inject(method = "handleFallDamage", at = @At("HEAD"))
+	void onLanded(double fallDistance, float damagePerDistance, DamageSource damageSource, CallbackInfoReturnable<Boolean> cir)
 	{
-		if(!onGround || heightDifference >= 0f)
-			return;
 		getNearbyPlayers().forEach(p -> ServerPlayNetworking.send(p,
-				new EntityLandPayload(getId(), (float)heightDifference)));
+				new EntityLandPayload(getId(), (float)fallDistance)));
 	}
 	
 	@Inject(method = "onDeath", at = @At("TAIL"))

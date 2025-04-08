@@ -40,7 +40,6 @@ public class PuddleParticle extends SurfaceAlignedParticle
 	protected PuddleParticle(ClientWorld clientWorld, Vec3d pos, SpriteProvider spriteProvider, FinalGoopData data, Direction up)
 	{
 		super(clientWorld, pos, spriteProvider, data, up);
-		alpha = Math.min(random.nextFloat() + 0.5f, 1);
 		baseAlpha = alpha;
 		scale = 0f;
 		appearTicks = random.nextInt(2) + 3;

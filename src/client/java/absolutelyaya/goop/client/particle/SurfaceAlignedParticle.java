@@ -41,11 +41,11 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 		gravityStrength = 0;
 		if(GoopClientConfig.INSTANCE.puddleRot.getValue())
 			angle = random.nextFloat() * 360;
-		float[] c = new Color(GoopClient.getColorOrCensor(data), true).getColorComponents(null);
-		if(c.length >= 3)
-			setColor(c[0], c[1], c[2]);
-		if(c.length >= 4)
-			alpha = c[3];
+		
+		int ci = GoopClient.getColorOrCensor(data);
+		Color c = new Color(ci, (ci >> 24 & 0xff) > 0);
+		setColor(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f);
+		alpha = c.getAlpha() / 255f;
 		
 		ImmutableList.Builder<Vertex> builder = new ImmutableList.Builder<>();
 		
@@ -233,11 +233,11 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 	boolean isValidPos(Vec3d pos)
 	{
 		HitResult hit = world.raycast(new RaycastContext(pos, pos.offset(up, 0.15f),
-				RaycastContext.ShapeType.VISUAL, RaycastContext.FluidHandling.NONE, ShapeContext.absent()));
+				RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, ShapeContext.absent()));
 		if(!hit.getType().equals(HitResult.Type.MISS))
 			return false;
 		hit = world.raycast(new RaycastContext(pos, pos.offset(up.getOpposite(), 0.15f),
-				RaycastContext.ShapeType.VISUAL, RaycastContext.FluidHandling.NONE, ShapeContext.absent()));
+				RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, ShapeContext.absent()));
 		return !hit.getType().equals(HitResult.Type.MISS);
 	}
 	

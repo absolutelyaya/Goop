@@ -7,6 +7,7 @@ import absolutelyaya.goop.particle.SplatterParticleEffect;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -44,11 +45,11 @@ public class LandingEmitter extends AbstractEmitter
 		float ccount = count.calculate(vars);
 		if(ccount < 1)
 		{
-			HitResult hit = entity.getWorld().raycast(new RaycastContext(entity.getPos(), entity.getPos().add(0, -1, 0),
+			HitResult hit = entity.getWorld().raycast(new RaycastContext(entity.getPos().add(0f, 0.5f, 0f), entity.getPos().add(0, -amount, 0),
 					RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity));
 			Vec3d hitPos = hit.getPos();
 			entity.getWorld().addParticleClient(new PuddleParticleEffect(goopData.calculate(vars), Direction.UP),
-					hitPos.getX(), hitPos.getY(), hitPos.getZ(), 0, 0, 0);
+					hitPos.getX(), hitPos.getY() + 0.01f, hitPos.getZ(), 0, 0, 0);
 			return;
 		}
 		for (int i = 0; i < ccount; i++)

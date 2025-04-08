@@ -17,7 +17,7 @@ public class DripParticle extends SpriteBillboardParticle
 	protected final SpriteProvider spriteProvider;
 	
 	Vec3d curScale, lastScale;
-	float speed;
+	float speed, baseAlpha;
 	
 	protected DripParticle(ClientWorld world, Vec3d pos, SpriteProvider spriteProvider, int color, float scale)
 	{
@@ -31,11 +31,9 @@ public class DripParticle extends SpriteBillboardParticle
 		alpha = 0;
 		speed = 1.5f + random.nextFloat() * 1.5f;
 		
-		float[] c = new Color(color, true).getColorComponents(null);
-		if(c.length >= 3)
-			setColor(c[0], c[1], c[2]);
-		if(c.length >= 4)
-			alpha = c[3];
+		Color c = new Color(color, (color >> 24 & 0xff) > 0);
+		setColor(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f);
+		baseAlpha = c.getAlpha() / 255f * 2f;
 	}
 	
 	@Override
@@ -48,7 +46,7 @@ public class DripParticle extends SpriteBillboardParticle
 	public void tick()
 	{
 		super.tick();
-		alpha = Math.min(MathHelper.lerp((float)age / maxAge, 2f, 0f), 1f);
+		alpha = Math.min(MathHelper.lerp((float)age / maxAge, baseAlpha, 0f), 1f);
 		if (!onGround)
 		{
 			lastScale = curScale;

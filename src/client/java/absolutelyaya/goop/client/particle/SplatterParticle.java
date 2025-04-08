@@ -43,11 +43,11 @@ public class SplatterParticle extends SpriteBillboardParticle
 		gravityStrength = 1 + scale / 2;
 		maxAge = 300;
 		collidesWithWorld = true;
-		float[] c = new Color(GoopClient.getColorOrCensor(data), true).getColorComponents(null);
-		if(c.length >= 3)
-			setColor(c[0], c[1], c[2]);
-		if(c.length >= 4)
-			alpha = c[3];
+		
+		int ci = GoopClient.getColorOrCensor(data);
+		Color c = new Color(ci, (ci >> 24 & 0xff) > 0);
+		setColor(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f);
+		alpha = c.getAlpha() / 255f;
 		
 		if(vel.length() > 0f)
 			setVelocity(vel.x, vel.y, vel.z);
