@@ -14,7 +14,13 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.text.Text;
+
+import java.util.Optional;
 
 public class GoopClient implements ClientModInitializer
 {
@@ -49,6 +55,14 @@ public class GoopClient implements ClientModInitializer
 					client.player.sendMessage(Text.translatable("message.goop.client_only_notice"), false);
 			}
 		});
+		
+		Optional<ModContainer> modContainer = FabricLoader.getInstance().getModContainer(Goop.MOD_ID);
+		ResourceManagerHelper.registerBuiltinResourcePack(Goop.id("everything_bleeds"),
+				modContainer.orElseThrow(), Text.translatable("resourcepack.everything_bleeds.name"), ResourcePackActivationType.NORMAL);
+		ResourceManagerHelper.registerBuiltinResourcePack(Goop.id("sensible_blood"),
+				modContainer.orElseThrow(), Text.translatable("resourcepack.sensible_blood.name"), ResourcePackActivationType.DEFAULT_ENABLED);
+		ResourceManagerHelper.registerBuiltinResourcePack(Goop.id("slime"),
+				modContainer.orElseThrow(), Text.translatable("resourcepack.slime.name"), ResourcePackActivationType.DEFAULT_ENABLED);
 	}
 	
 	public static int getColorOrCensor(FinalGoopData data)

@@ -1,0 +1,14 @@
+{
+  "type": "DAMAGE",
+  "targets": [
+    "#goop:redblood"
+  ],
+  "goop": {
+    "color": "b11208",
+    "size": "min(0.75 + damage / 4 + rand(0.3), 2)",
+    "waterhandling": "REPLACE_WITH_CLOUD_PARTICLE",
+    "mature": true
+  },
+  "count": "clamp(damage / 2, 1, 32)",
+  "speed": "min(damage / 5, 0.8)"
+}

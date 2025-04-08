@@ -10,7 +10,7 @@
       0.47,
       1
     ],
-    "size": 1,
+    "size": "min(0.5 + fallDist / 3, 5)",
     "waterhandling": "REPLACE_WITH_CLOUD_PARTICLE"
   }
 }

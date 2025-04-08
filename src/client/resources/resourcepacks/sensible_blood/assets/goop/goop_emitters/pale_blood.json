@@ -1,0 +1,13 @@
+{
+  "type": "DAMAGE",
+  "targets": [
+    "minecraft:shulker"
+  ],
+  "goop": {
+    "color": "9c87c4",
+    "size": "min(0.2 + damage / 4 + rand(0.3), 1.2)",
+    "waterhandling": "REPLACE_WITH_CLOUD_PARTICLE"
+  },
+  "count": "clamp(damage / 2, 1, 32)",
+  "speed": "min(damage / 5, 0.8)"
+}

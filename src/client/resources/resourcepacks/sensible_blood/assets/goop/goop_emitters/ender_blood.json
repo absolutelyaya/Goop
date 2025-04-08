@@ -1,0 +1,15 @@
+{
+  "type": "DAMAGE",
+  "targets": [
+    "minecraft:enderdragon",
+    "minecraft:enderman",
+    "minecraft:endermite"
+  ],
+  "goop": {
+    "color": "8a26d1",
+    "size": "min(0.75 + damage / 4 + rand(0.3), 2)",
+    "waterhandling": "REPLACE_WITH_CLOUD_PARTICLE"
+  },
+  "count": "clamp(damage / 2, 1, 32)",
+  "speed": "min(damage / 5, 0.8)"
+}

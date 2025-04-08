@@ -4,6 +4,10 @@
   "category.goop": "Goop",
   "key.goop.clear": "Clear All Puddles",
 
+  "resourcepack.sensible_blood.name": "Sensible Blood",
+  "resourcepack.everything_bleeds.name": "§4EVERYTHING BLEEDS",
+  "resourcepack.slime.name": "Slimier Slimes",
+
   "config.goop.GoopCap": "Goop Cap",
   "config.goop.GoopCap.description": "The Maximum Amount of Goop Puddles that can exist at a time.",
   "config.goop.RainCleaning": "Rain Cleaning",

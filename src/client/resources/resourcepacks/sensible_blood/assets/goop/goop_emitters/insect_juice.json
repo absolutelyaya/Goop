@@ -1,0 +1,13 @@
+{
+  "type": "DAMAGE",
+  "targets": [
+    "minecraft:silverfish"
+  ],
+  "goop": {
+    "color": "68a341",
+    "size": "min(0.5 + damage / 4 + rand(0.3), 1)",
+    "waterhandling": "REPLACE_WITH_CLOUD_PARTICLE"
+  },
+  "count": "0",
+  "speed": "0.01"
+}

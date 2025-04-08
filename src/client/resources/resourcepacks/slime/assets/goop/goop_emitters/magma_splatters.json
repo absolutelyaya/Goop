@@ -1,0 +1,13 @@
+{
+  "type": "DAMAGE",
+  "targets": [
+    "minecraft:magma_cube"
+  ],
+  "goop": {
+    "color": "c73f00",
+    "size": "min(0.75 + damage / 4 + rand(0.3), 2)",
+    "waterhandling": "REPLACE_WITH_CLOUD_PARTICLE"
+  },
+  "count": "clamp(damage / 2, 1, 32)",
+  "speed": "min(damage / 5, 0.8)"
+}
