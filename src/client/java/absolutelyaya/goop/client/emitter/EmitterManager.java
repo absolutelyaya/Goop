@@ -9,6 +9,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageType;
 import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.resource.JsonDataLoader;
 import net.minecraft.resource.ResourceFinder;
@@ -19,6 +20,7 @@ import net.minecraft.util.profiler.Profiler;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class EmitterManager extends JsonDataLoader<AbstractEmitter> implements SimpleSynchronousResourceReloadListener
 {
@@ -60,7 +62,8 @@ public class EmitterManager extends JsonDataLoader<AbstractEmitter> implements S
 				continue;
 			if(!(i instanceof DamageEmitter emitter))
 				continue;
-			if(damageType.equals(DamageTypes.GENERIC_KILL) || !matchesAnyDamageType(emitter.damageTypes, damageType))
+			Optional<RegistryKey<DamageType>> damageTypeKey = damageType.getKey();
+			if((damageTypeKey.isPresent() && damageTypeKey.get().equals(DamageTypes.GENERIC_KILL)) || !matchesAnyDamageType(emitter.damageTypes, damageType))
 				continue;
 			emitter.emit(entity, amount);
 		}
