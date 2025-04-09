@@ -4,6 +4,7 @@ import absolutelyaya.goop.data.Calculatable;
 import absolutelyaya.goop.data.ModularGoopData;
 import absolutelyaya.goop.particle.PuddleParticleEffect;
 import absolutelyaya.goop.particle.SplatterParticleEffect;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.entity.LivingEntity;
@@ -24,15 +25,18 @@ public class DamageEmitter extends AbstractEmitter
 			ModularGoopData.CODEC.fieldOf("goop").forGetter(emitter -> emitter.goopData),
 			DamageTypeReference.CODEC.listOf().optionalFieldOf("damage-types", List.of()).forGetter(emitter -> emitter.damageTypes),
 			Calculatable.CODEC.optionalFieldOf("count", new Calculatable("clamp(damage, 1, 32)")).forGetter(emitter -> emitter.count),
-			Calculatable.CODEC.optionalFieldOf("speed", new Calculatable("0")).forGetter(emitter -> emitter.speed)
+			Calculatable.CODEC.optionalFieldOf("speed", new Calculatable("0")).forGetter(emitter -> emitter.speed),
+			Codec.BOOL.optionalFieldOf("limitDamage", true).forGetter(emitter -> emitter.limitDamage)
 	).apply(instance, DamageEmitter::new));
 	
 	public final List<DamageTypeReference> damageTypes;
+	public final boolean limitDamage;
 	
-	public DamageEmitter(List<EntityTypeReference> targets, ModularGoopData goopData, List<DamageTypeReference> damageTypes, Calculatable count, Calculatable speed)
+	public DamageEmitter(List<EntityTypeReference> targets, ModularGoopData goopData, List<DamageTypeReference> damageTypes, Calculatable count, Calculatable speed, boolean limitDamage)
 	{
 		super(targets, goopData, count, speed);
 		this.damageTypes = damageTypes;
+		this.limitDamage = limitDamage;
 	}
 	
 	@Override
@@ -44,7 +48,9 @@ public class DamageEmitter extends AbstractEmitter
 	public void emit(LivingEntity entity, float amount)
 	{
 		Random rand = entity.getRandom();
-		Map<String, Float> vars = Map.of("damage", Math.min(amount, entity.getMaxHealth()));
+		Map<String, Float> vars = Map.of(
+				"damage", limitDamage ? Math.min(amount, entity.getMaxHealth()) : amount
+		);
 		float ccount = count.calculate(vars);
 		if(ccount < 1)
 		{
