@@ -1,7 +1,7 @@
 {
   "type": "DAMAGE",
   "targets": [
-    "minecraft:enderdragon",
+    "minecraft:ender_dragon",
     "minecraft:enderman",
     "minecraft:endermite"
   ],

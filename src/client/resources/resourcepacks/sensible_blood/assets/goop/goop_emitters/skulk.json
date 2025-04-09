@@ -1,10 +1,10 @@
 {
   "type": "DAMAGE",
   "targets": [
-    "minecraft:squid"
+    "minecraft:warden"
   ],
   "goop": {
-    "color": "21113c",
+    "color": "00524b",
     "size": "min(0.75 + damage / 4 + rand(0.3), 2)",
     "waterhandling": "REPLACE_WITH_CLOUD_PARTICLE"
   },
