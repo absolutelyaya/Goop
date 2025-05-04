@@ -81,7 +81,7 @@ public class SplatterParticle extends SpriteBillboardParticle
 				case REMOVE_PARTICLE -> markDead();
 				case REPLACE_WITH_CLOUD_PARTICLE ->
 				{
-					world.addParticle(new DustParticleEffect(GoopClient.getColorOrCensorVec(data), scale * 2.5f), x, y, z,
+					world.addParticle(new DustParticleEffect(GoopClient.getColorOrCensor(data), scale * 2.5f), x, y, z,
 							random.nextFloat() * 0.1f, random.nextFloat() * 0.1f, random.nextFloat() * 0.1f);
 					markDead();
 				}

@@ -46,7 +46,7 @@ public abstract class LivingEntityMixin extends Entity
 			lastHealth = dataTracker.get(HEALTH);
 			if(delta <= 0)
 				return;
-			getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).getOrEmpty(DamageTypes.GENERIC).ifPresent(value -> {
+			getWorld().getRegistryManager().getOrThrow(RegistryKeys.DAMAGE_TYPE).getOptionalValue(DamageTypes.GENERIC).ifPresent(value -> {
 				EmitterManager.onDamage((LivingEntity)((Object)this), RegistryEntry.of(value), delta);
 			});
 		}

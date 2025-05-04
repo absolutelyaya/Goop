@@ -103,7 +103,7 @@ public class PuddleParticle extends SurfaceAlignedParticle
 				case REMOVE_PARTICLE -> markDead();
 				case REPLACE_WITH_CLOUD_PARTICLE ->
 				{
-					world.addParticle(new DustParticleEffect(GoopClient.getColorOrCensorVec(data), scale), x, y, z,
+					world.addParticle(new DustParticleEffect(GoopClient.getColorOrCensor(data), scale), x, y, z,
 							random.nextFloat() * 0.1f, random.nextFloat() * 0.1f, random.nextFloat() * 0.1f);
 					markDead();
 				}
@@ -112,10 +112,10 @@ public class PuddleParticle extends SurfaceAlignedParticle
 	}
 	
 	@Override
-	public void buildGeometry(VertexConsumer vertexConsumer, Camera camera, float delta)
+	public void render(VertexConsumer vertexConsumer, Camera camera, float delta)
 	{
 		scale = MathHelper.clampedLerp(lastScale, curScale, delta);
-		super.buildGeometry(vertexConsumer, camera, delta);
+		super.render(vertexConsumer, camera, delta);
 	}
 	
 	@Override

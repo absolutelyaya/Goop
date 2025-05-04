@@ -55,7 +55,7 @@ public class DripParticle extends SpriteBillboardParticle
 	}
 	
 	@Override
-	public void buildGeometry(VertexConsumer vertexConsumer, Camera camera, float delta)
+	public void render(VertexConsumer vertexConsumer, Camera camera, float delta)
 	{
 		Vec3d camPos = camera.getPos();
 		Vec3d dir = new Vec3d(x, y, z).subtract(camPos).normalize();

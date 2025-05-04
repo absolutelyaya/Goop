@@ -10,6 +10,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
@@ -31,9 +32,9 @@ public abstract class LivingEntityMixin extends Entity
 	}
 	
 	@Inject(method = "damage", at = @At("TAIL"))
-	void onDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir)
+	void onDamage(ServerWorld world, DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir)
 	{
-		if(getWorld().isClient)
+		if(world.isClient)
 			return;
 		getNearbyPlayers().forEach(p -> ServerPlayNetworking.send(p,
 				new EntityDamagePayload(getId(), RegistryEntry.of(source.getType()), amount)));

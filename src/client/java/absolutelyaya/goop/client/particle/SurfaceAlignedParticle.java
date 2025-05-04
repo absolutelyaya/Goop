@@ -78,7 +78,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 	}
 	
 	@Override
-	public void buildGeometry(VertexConsumer vertexConsumer, Camera camera, float delta)
+	public void render(VertexConsumer vertexConsumer, Camera camera, float delta)
 	{
 		boolean debug = GoopClientConfig.INSTANCE.debug.getValue() && !MinecraftClient.getInstance().isPaused();
 		if(vertices.isEmpty())
@@ -91,8 +91,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 		float dz = (float)(MathHelper.lerp(delta, this.prevPosZ, this.z) - camPos.getZ());
 		
 		List<Vec3d> verts = new ArrayList<>();
-		this.vertices.forEach(i ->
-			verts.add(i.pos.subtract(new Vec3d(up.getOffsetZ() * 0.5f, up.getAxis().isVertical() ? 0f : 0.5f, up.getOffsetX() * 0.5f))));
+		this.vertices.forEach(i -> verts.add(i.pos.subtract(new Vec3d(up.getOffsetZ() * 0.5f, up.getAxis().isVertical() ? 0f : 0.5f, up.getOffsetX() * 0.5f))));
 		
 		for (int i = 0; i < verts.size(); i++)
 		{
@@ -131,7 +130,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 					faceCenter = faceCenter.multiply(0.25f);
 					//check if position of this face is attached to a valid surface
 					Vec3d v = camPos.add(faceCenter);
-						render = isValidPos(v);
+					render = isValidPos(v);
 					if(!render)
 					{
 						vertices.get(vi).visible = false; //so faces don't reappear after being removed
@@ -150,7 +149,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 					if(debug && age % 10 == 0)
 					{
 						//face normal, emitted from center
-						Vec3d vel = new Vec3d(up.getUnitVector()).multiply(0.05f);
+						Vec3d vel = up.getDoubleVector().multiply(0.05f);
 						world.addParticle(ParticleTypes.FLAME,
 								camPos.x + faceCenter.getX(), camPos.y + faceCenter.getY() + 0.1, camPos.z + faceCenter.getZ(),
 								vel.x, vel.y, vel.z);
@@ -204,7 +203,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 						//goop Vertices, colored based on UVs
 						for (Vec3d vertex : faceVerts)
 						{
-							world.addParticle(new DustParticleEffect(new Vector3f(x / targetSize, y / targetSize, 0f), 0.5f),
+							world.addParticle(new DustParticleEffect(new Color(x / targetSize, y / targetSize, 0f).getRGB(), 0.5f),
 									camPos.x + vertex.getX(), camPos.y + vertex.getY() + 0.1, camPos.z + vertex.getZ(), 0, 0.05, 0);
 						}
 					}
@@ -215,7 +214,7 @@ public abstract class SurfaceAlignedParticle extends SpriteBillboardParticle
 		if(debug && age % 3 == 0)
 		{
 			//goop Center
-			world.addParticle(new DustParticleEffect(new Vector3f(1f, 1f, 1f), 1f), this.x, this.y, this.z, 0, 0.25, 0);
+			world.addParticle(new DustParticleEffect(0xffffff, 1f), this.x, this.y, this.z, 0, 0.25, 0);
 		}
 	}
 	
