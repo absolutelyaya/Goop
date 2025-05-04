@@ -14,7 +14,7 @@
   },
   "license": "MIT",
   "icon": "assets/goop/icon.png",
-  "environment": "client",
+  "environment": "*",
   "accessWidener": "goop.accesswidener",
   "entrypoints": {
     "client": [

@@ -1,12 +1,16 @@
 package absolutelyaya.goop.client.mixin;
 
 import absolutelyaya.goop.Goop;
+import absolutelyaya.goop.client.emitter.EmitterManager;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.data.TrackedData;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -34,14 +38,17 @@ public abstract class LivingEntityMixin extends Entity
 	@Inject(method = "onTrackedDataSet", at = @At("HEAD"))
 	void onTrackedDataSet(TrackedData<?> data, CallbackInfo ci)
 	{
-		if(!Goop.CLIENT_ONLY || !getWorld().isClient)
+		if(!Goop.CLIENT_ONLY)
 			return;
 		if(data.equals(HEALTH))
 		{
 			float delta = lastHealth - dataTracker.get(HEALTH);
-			if(delta >= 0)
-				return;
 			lastHealth = dataTracker.get(HEALTH);
+			if(delta <= 0)
+				return;
+			getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).getOrEmpty(DamageTypes.GENERIC).ifPresent(value -> {
+				EmitterManager.onDamage((LivingEntity)((Object)this), RegistryEntry.of(value), delta);
+			});
 		}
 	}
 }
